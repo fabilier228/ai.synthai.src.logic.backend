@@ -35,6 +35,9 @@ jobs:
       - name: Build with Maven
         run: ./mvnw clean package --no-transfer-progress
 
+      - name: Lint code (Checkstyle)
+        run: ./mvnw checkstyle:check --no-transfer-progress
+
       - name: Run tests
         run: ./mvnw test --no-transfer-progress
 
