@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Copy Maven files
 COPY pom.xml .
+COPY checkstyle.xml .
 COPY src ./src
 
 # Build application
