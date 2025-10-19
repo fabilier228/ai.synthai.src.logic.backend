@@ -16,17 +16,17 @@ public class TranscriptionRepositoryFacade implements TranscriptionRespositoryPo
     private final TranscriptionMapper transcriptionMapper;
 
     @Override
-    public void save(TranscriptionEntity transcription) {
+    public void save(final TranscriptionEntity transcription) {
         transcriptionJpaRepository.save(transcription);
     }
 
     @Override
-    public void deleteBydId(Long id) {
-
-    }
+    public void deleteBydId(final Long id) {}
 
     @Override
-    public Optional<Transcription> findByKeycloakId(String keycloakId) {
-        return transcriptionJpaRepository.findByKeycloakId(keycloakId).map(transcriptionMapper::toDomain);
+    public Optional<Transcription> findByKeycloakId(final String keycloakId) {
+        return transcriptionJpaRepository
+            .findByKeycloakId(keycloakId)
+            .map(transcriptionMapper::toDomain);
     }
 }

@@ -15,7 +15,7 @@ public class DataSourceConfig {
     @Bean
     @Primary
     @ConfigurationProperties("spring.datasource")
-    public DataSource dataSource(DataSourceProperties properties) {
+    public DataSource dataSource(final DataSourceProperties properties) {
         return DataSourceBuilder.create()
                 .driverClassName(properties.getDriverClassName())
                 .url(properties.getUrl())
