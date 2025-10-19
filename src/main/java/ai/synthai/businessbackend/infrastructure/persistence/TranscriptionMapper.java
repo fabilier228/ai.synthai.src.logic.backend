@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @NoArgsConstructor
-public class TranscriptionMapper {
-    public TranscriptionEntity toEntity(Transcription transcription) {
+public final class TranscriptionMapper {
+
+    public TranscriptionEntity toEntity(final Transcription transcription) {
         TranscriptionEntity entity = new TranscriptionEntity();
         entity.setId(transcription.getId());
         entity.setKeycloakId(transcription.getKeycloakId());
@@ -17,18 +18,20 @@ public class TranscriptionMapper {
         entity.setTranscript(transcription.getTranscript());
         entity.setSummary(transcription.getSummary());
         entity.setCreatedAt(transcription.getCreatedAt());
-
         return entity;
     }
-    public Transcription toDomain(TranscriptionEntity transcriptionEntity) {
+
+    public Transcription toDomain(final TranscriptionEntity transcriptionEntity) {
         return Transcription.builder()
-                .id(transcriptionEntity.getId())
-                .keycloakId(transcriptionEntity.getKeycloakId())
-                .title(transcriptionEntity.getTitle())
-                .category(transcriptionEntity.getCategory())
-                .transcript(transcriptionEntity.getTranscript())
-                .summary(transcriptionEntity.getSummary())
-                .createdAt(transcriptionEntity.getCreatedAt())
-                .build();
+            .id(transcriptionEntity.getId())
+            .keycloakId(transcriptionEntity.getKeycloakId())
+            .title(transcriptionEntity.getTitle())
+            .category(transcriptionEntity.getCategory())
+            .transcript(transcriptionEntity.getTranscript())
+            .summary(transcriptionEntity.getSummary())
+            .createdAt(
+                transcriptionEntity.getCreatedAt()
+            )
+            .build();
     }
 }

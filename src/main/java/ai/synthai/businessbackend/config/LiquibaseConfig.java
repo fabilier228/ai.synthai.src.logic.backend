@@ -12,12 +12,20 @@ import liquibase.integration.spring.SpringLiquibase;
 @Configuration
 public class LiquibaseConfig {
     @Bean
-    @ConditionalOnProperty(name = "spring.liquibase.enabled", havingValue = "true", matchIfMissing = false)
-    public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
+    @ConditionalOnProperty(
+        name = "spring.liquibase.enabled",
+        havingValue = "true",
+        matchIfMissing = false)
+    public SpringLiquibase liquibase(
+        @Qualifier("dataSource") final DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.xml");
-        liquibase.setShouldRun(true); // lub false w testach
+        liquibase.setChangeLog(
+            "classpath:db/changelog/"
+                + "db.changelog-"
+                + "master.xml"
+        );
+        liquibase.setShouldRun(true);
         return liquibase;
     }
 }

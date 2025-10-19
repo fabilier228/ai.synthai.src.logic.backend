@@ -9,5 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TranscriptionJpaRepository extends JpaRepository<TranscriptionEntity, Long> {
-    Optional<TranscriptionEntity> findByKeycloakId(String keycloakId);
+    Optional<TranscriptionEntity> findByKeycloakId(
+        String keycloakId
+    );
 }
