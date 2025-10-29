@@ -1,4 +1,4 @@
-name: Ręczne Wdrożenie na Development
+name: CD pipeline - Logic Backend
 
 on:
   workflow_dispatch:
