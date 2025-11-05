@@ -13,7 +13,6 @@ public class PromptTemplateProvider {
     }
 
     private String getSongTemplate(String transcript) {
-        // Użycie bloku tekstu ("""...""") i .formatted() do wstrzyknięcia transkryptu
         return """
                 You are an expert music analyst and software system.
                 Analyze the following song lyrics and return ONLY a valid JSON object (no markdown,
