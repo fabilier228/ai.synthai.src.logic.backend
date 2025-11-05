@@ -2,12 +2,10 @@ FROM maven:3.8-openjdk-17 AS build
 
 WORKDIR /app
 
-# Copy Maven files
 COPY pom.xml .
 COPY checkstyle.xml .
 COPY src ./src
 
-# Build application
 RUN mvn clean package -DskipTests
 
 # Runtime stage
