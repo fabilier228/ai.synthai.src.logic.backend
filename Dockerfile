@@ -11,7 +11,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 
 # Install curl for health check
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
