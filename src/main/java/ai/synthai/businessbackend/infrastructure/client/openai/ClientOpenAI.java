@@ -8,25 +8,26 @@ import com.azure.ai.openai.models.ChatCompletionsOptions;
 import com.azure.ai.openai.models.ChatRequestMessage;
 import com.azure.ai.openai.models.ChatRequestUserMessage;
 import com.azure.core.credential.AzureKeyCredential;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ClientOpenAI {
 
-    @Value("${spring.azure.resources.api.key}")
+    @Value("${spring.azure.resources.openai.key}")
     private String apiKey;
 
-    @Value("${spring.azure.resources.api.endpoint}")
+    @Value("${spring.azure.resources.openai.endpoint}")
     private String apiEndpoint;
 
     @Value("${spring.azure.resources.openai.deployment-name}")
     private String deploymentName;
 
-    private PromptTemplateProvider promptTemplateProvider;
+    private final PromptTemplateProvider promptTemplateProvider;
 
     public String getTranscriptionAnalysis(Category category, String transcript) {
         OpenAIClient client = createClient();
@@ -44,6 +45,7 @@ public class ClientOpenAI {
                 .get(0)
                 .getMessage()
                 .getContent();
+
     }
 
     private OpenAIClient createClient() {
