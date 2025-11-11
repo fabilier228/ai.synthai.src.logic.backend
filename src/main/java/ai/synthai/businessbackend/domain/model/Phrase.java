@@ -7,14 +7,13 @@ import java.util.List;
 
 @Builder
 @Getter
-public record Phrase(
-        int channel,
-        int speaker,
-        int offsetMilliseconds,
-        int durationMilliseconds,
-        String text,
-        List<Word> words,
-        String locale,
-        double confidence
-) {
+public class Phrase {
+    int channel;
+    int speaker;
+    int offsetMilliseconds;
+    int durationMilliseconds;
+    String text;
+    List<Word> words;
+    String locale;
+    double confidence;
 }
