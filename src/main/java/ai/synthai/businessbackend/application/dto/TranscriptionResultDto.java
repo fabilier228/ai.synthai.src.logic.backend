@@ -1,7 +1,7 @@
 package ai.synthai.businessbackend.application.dto;
 
-import ai.synthai.businessbackend.domain.model.CombinedPhrase;
-import ai.synthai.businessbackend.domain.model.Phrase;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.CombinedPhrase;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.Phrase;
 import lombok.*;
 
 import java.util.List;
@@ -9,8 +9,7 @@ import java.util.List;
 @Data
 @Builder
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TranscriptionResultDto {
 
     private long durationMilliseconds;
