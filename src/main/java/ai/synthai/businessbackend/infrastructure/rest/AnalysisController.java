@@ -1,14 +1,17 @@
 package ai.synthai.businessbackend.infrastructure.rest;
 
 
+import ai.synthai.businessbackend.application.dto.EmotionalTranscriptionResponseDto;
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
 import ai.synthai.businessbackend.application.service.AudiobookTranscriptionService;
 import ai.synthai.businessbackend.application.service.CallTranscriptionService;
+import ai.synthai.businessbackend.application.service.EmotionalTranscriptionService;
 import ai.synthai.businessbackend.application.service.LectureTranscriptionService;
 import ai.synthai.businessbackend.application.service.SongTranscriptionService;
 import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;
 import ai.synthai.businessbackend.domain.model.Status;
+import ai.synthai.businessbackend.domain.model.analysis.EmotionalTranscriptionAnalysis;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,7 @@ public class AnalysisController {
     private final LectureTranscriptionService lectureTranscriptionService;
     private final CallTranscriptionService callTranscriptionService;
     private final AudiobookTranscriptionService audiobookTranscriptionService;
+    private final EmotionalTranscriptionService emotionalTranscriptionService;
 
 
     @PostMapping("/song")
@@ -78,7 +82,7 @@ public class AnalysisController {
             @RequestParam("keycloakId") String keycloakId,
             @RequestParam("title") String title) {
         try {
-            TranscriptionResponseDto response = lectureTranscriptionService.analyzeLecture(audioFile, language, keycloakId, title);
+            TranscriptionResponseDto response = audiobookTranscriptionService.analyzeAudiobook(audioFile, language, keycloakId, title);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during audiobook analysis", e);
@@ -111,5 +115,16 @@ public class AnalysisController {
                             .language(language)
                             .build());
         }
+    }
+
+    @PostMapping("/emotion")
+    public ResponseEntity<EmotionalTranscriptionResponseDto> analyzeEmotion(
+            @RequestParam("audioFile") MultipartFile audioFile) {
+        EmotionalTranscriptionAnalysis analysis = emotionalTranscriptionService.analyzeEmotion(audioFile);
+        EmotionalTranscriptionResponseDto dto = EmotionalTranscriptionResponseDto.builder()
+            .transcription(analysis.getTranscription())
+            .emotion(analysis.getEmotion())
+            .build();
+        return ResponseEntity.ok(dto);
     }
 }
