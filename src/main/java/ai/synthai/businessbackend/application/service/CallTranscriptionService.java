@@ -1,6 +1,5 @@
 package ai.synthai.businessbackend.application.service;
 
-import ai.synthai.businessbackend.application.dto.MusicRecognitionResultDto;
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.TranscriptionUtils;
@@ -9,11 +8,9 @@ import ai.synthai.businessbackend.domain.model.Language;
 import ai.synthai.businessbackend.domain.model.Status;
 import ai.synthai.businessbackend.domain.model.Transcription;
 import ai.synthai.businessbackend.domain.model.analysis.CallTranscriptionAnalysis;
-import ai.synthai.businessbackend.domain.model.analysis.SongTranscriptionAnalysis;
 import ai.synthai.businessbackend.domain.model.analysis.summary.CallSummary;
 import ai.synthai.businessbackend.domain.model.analysis.summary.SongSummary;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
-import ai.synthai.businessbackend.infrastructure.client.AudDClient;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
 import ai.synthai.businessbackend.infrastructure.client.openai.ClientOpenAI;
 import lombok.RequiredArgsConstructor;
