@@ -1,7 +1,8 @@
 package ai.synthai.businessbackend.infrastructure.client.openai;
 
 import ai.synthai.businessbackend.domain.model.Category;
-
+import org.springframework.stereotype.Component;
+@Component
 public class PromptTemplateProvider {
     public String templateByCategory(Category category, String transcript) {
         return switch (category) {
