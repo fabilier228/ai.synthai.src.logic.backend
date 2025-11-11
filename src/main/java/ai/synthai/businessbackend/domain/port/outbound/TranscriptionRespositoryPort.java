@@ -6,7 +6,9 @@ import ai.synthai.businessbackend.infrastructure.persistence.entity.Transcriptio
 import java.util.Optional;
 
 public interface TranscriptionRespositoryPort {
-    void save(TranscriptionEntity transcription);
+
+    void save(Transcription transcription);
+
     void deleteBydId(Long id);
     Optional<Transcription> findByKeycloakId(String id);
 }

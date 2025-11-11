@@ -16,8 +16,9 @@ public class TranscriptionRepositoryFacade implements TranscriptionRespositoryPo
     private final TranscriptionMapper transcriptionMapper;
 
     @Override
-    public void save(final TranscriptionEntity transcription) {
-        transcriptionJpaRepository.save(transcription);
+    public void save(final Transcription transcription) {
+        TranscriptionEntity entity = transcriptionMapper.toEntity(transcription);
+        transcriptionJpaRepository.save(entity);
     }
 
     @Override
