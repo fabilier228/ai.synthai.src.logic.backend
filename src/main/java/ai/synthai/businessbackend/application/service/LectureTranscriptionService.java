@@ -27,7 +27,7 @@ public class LectureTranscriptionService {
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
 
-    public TranscriptionResponseDto analyzeLecture(MultipartFile audioFile, Language language, String keycloakId) {
+    public TranscriptionResponseDto analyzeLecture(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE);
             val transcriptionContent = TranscriptionUtils.getText((TranscriptionResultDto) transcription);
@@ -36,7 +36,7 @@ public class LectureTranscriptionService {
 
             Transcription transcriptionToSave = Transcription.builder()
                     .keycloakId(keycloakId)
-                    .title(readyResponse.getSummary().getTitle())
+                    .title(title)
                     .category(Category.LECTURE.name())
                     .transcript(transcriptionContent)
                     .summary(readyResponse.getSummary().toString())
