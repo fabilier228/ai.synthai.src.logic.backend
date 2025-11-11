@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @Builder
 @Getter
-@RequiredArgsConstructor
 @AllArgsConstructor
 public class TranscriptionResultDto {
 
