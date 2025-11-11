@@ -1,4 +1,4 @@
-package ai.synthai.businessbackend.domain.model;
+package ai.synthai.businessbackend.domain.model.batch.transcription.response;
 
 import lombok.Builder;
 import lombok.Getter;
