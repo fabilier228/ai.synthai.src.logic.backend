@@ -1,8 +1,12 @@
 package ai.synthai.businessbackend.domain.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 
-public record TranscriptionAnalysis(
-        String transcription,
-        JsonNode summary) {
+import java.util.Map;
+
+@Builder
+public class TranscriptionAnalysis {
+    String transcription;
+    Map<String, Object> summary;
 }

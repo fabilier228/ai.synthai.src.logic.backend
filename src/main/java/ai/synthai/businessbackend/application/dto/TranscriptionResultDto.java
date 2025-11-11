@@ -2,13 +2,13 @@ package ai.synthai.businessbackend.application.dto;
 
 import ai.synthai.businessbackend.domain.model.CombinedPhrase;
 import ai.synthai.businessbackend.domain.model.Phrase;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Data
+@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TranscriptionResultDto {

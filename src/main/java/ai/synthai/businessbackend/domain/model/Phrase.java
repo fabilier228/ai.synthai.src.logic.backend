@@ -1,7 +1,12 @@
 package ai.synthai.businessbackend.domain.model;
 
+import lombok.Builder;
+import lombok.Getter;
+
 import java.util.List;
 
+@Builder
+@Getter
 public record Phrase(
         int channel,
         int speaker,
