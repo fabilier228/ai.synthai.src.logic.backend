@@ -1,9 +1,11 @@
 package ai.synthai.businessbackend.application.service;
 
+import ai.synthai.businessbackend.application.dto.MusicRecognitionResultDto;
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.TranscriptionUtils;
 import ai.synthai.businessbackend.domain.model.*;
+import ai.synthai.businessbackend.domain.model.analysis.SongTranscriptionAnalysis;
 import ai.synthai.businessbackend.domain.model.analysis.summary.SongSummary;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import ai.synthai.businessbackend.infrastructure.client.AudDClient;
@@ -34,8 +36,8 @@ public class SongTranscriptionService {
             val musicResult = recognizeMusic(audioFile);
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG);
             val dialogue = TranscriptionUtils.createReadableDialogue((TranscriptionResultDto) transcription);
-            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue);
-            val readyResponse = buildResponse((TranscriptionResultDto) transcription, analysis, musicResult);
+            val analysis = (SongSummary) clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue);
+            val readyResponse = buildResponse((Map<String, Object>) analysis, musicResult, dialogue);
 
             Transcription transcriptionToSave = Transcription.builder()
                     .keycloakId(keycloakId)
@@ -64,11 +66,11 @@ public class SongTranscriptionService {
         }
     }
 
-    private MusicRecognitionResult recognizeMusic(MultipartFile audioFile) {
+    private MusicRecognitionResultDto recognizeMusic(MultipartFile audioFile) {
         try {
             Map<String, Object> resultMap = audDClient.recognizeMusic(audioFile);
             if (resultMap != null) {
-                return MusicRecognitionResult.builder()
+                return MusicRecognitionResultDto.builder()
                         .title((String) resultMap.get("title"))
                         .artist((String) resultMap.get("artist"))
                         .album((String) resultMap.get("album"))
@@ -83,15 +85,14 @@ public class SongTranscriptionService {
         } catch (Exception e) {
             log.error("Error analyzing song", e);
         }
-        return MusicRecognitionResult.builder().recognized(false).build();
+        return MusicRecognitionResultDto.builder().recognized(false).build();
     }
 
-    private TranscriptionAnalysis buildResponse(TranscriptionResultDto transcriptionDto, Map<String, Object> analysis, MusicRecognitionResult musicResult) {
-        String songTranscript = TranscriptionUtils.createReadableDialogue(transcriptionDto);
+    private SongTranscriptionAnalysis buildResponse(Map<String, Object> analysis, MusicRecognitionResultDto musicResult, String dialogue) {
         if (!musicResult.isRecognized()) {
-            return TranscriptionAnalysis.builder()
-                    .transcription(songTranscript)
-                    .summary(analysis)
+            return SongTranscriptionAnalysis.builder()
+                    .transcription(dialogue)
+                    .summary((SongSummary) analysis)
                     .build();
         }
 
@@ -109,11 +110,9 @@ public class SongTranscriptionService {
                 .symbolism(analysis.get("symbolism") != null ? (List<String>) analysis.get("symbolism") : null)
                 .build();
 
-        Map<String, Object> summaryMap = Map.of("songSummary", songSummary);
-
-        return TranscriptionAnalysis.builder()
-                .transcription(songTranscript)
-                .summary(summaryMap)
+        return SongTranscriptionAnalysis.builder()
+                .transcription(dialogue)
+                .summary(songSummary)
                 .build();
     }
 
