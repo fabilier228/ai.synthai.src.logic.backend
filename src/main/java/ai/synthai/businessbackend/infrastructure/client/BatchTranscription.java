@@ -14,8 +14,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +34,7 @@ public class BatchTranscription {
     @Value("${spring.azure.resources.speech.region}")
     private String region;
 
-    public ResponseEntity<TranscriptionResultDto> transcribeAudio(File audioFile, String locale, Category category) {
+    public Map<String, Object> transcribeAudio(MultipartFile audioFile, Category category) {
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -40,7 +43,7 @@ public class BatchTranscription {
 
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-            body.add("audio", new FileSystemResource(audioFile));
+            body.add("audio", audioFile.getResource());
 
             String definitionJson = createLocales(category);
 
@@ -54,20 +57,27 @@ public class BatchTranscription {
 
             String fullUrl = createApiEndpoint();
 
-            return restTemplate.postForEntity(fullUrl, requestEntity, TranscriptionResultDto.class);
+            @SuppressWarnings("rawtypes")
+            ResponseEntity<LinkedHashMap> response = restTemplate.postForEntity(fullUrl, requestEntity, LinkedHashMap.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody();
+            } else {
+                throw new RuntimeException("Speech API returned empty or unsuccessful response: " + response.getStatusCode());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error during transcription request", e);
         }
     }
 
     private String createApiEndpoint() {
-        return String.format("https://%s.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15'", region);
+        return String.format("https://%s.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15", region);
     }
 
     public String createLocales(Category category) {
         boolean diarization = switch (category) {
-            case LECTURE, PHONE_CALL -> true;
-            case AUDIOBOOK, SONG -> false;
+            case SONG, PHONE_CALL -> true;
+            case AUDIOBOOK, LECTURE -> false;
         };
 
         return String.format(TEMPLATE, DEFAULT_LOCALE, diarization);
