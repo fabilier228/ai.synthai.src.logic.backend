@@ -2,6 +2,8 @@ package ai.synthai.businessbackend.infrastructure.rest;
 
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
+import ai.synthai.businessbackend.application.service.AudiobookTranscriptionService;
+import ai.synthai.businessbackend.application.service.CallTranscriptionService;
 import ai.synthai.businessbackend.application.service.LectureTranscriptionService;
 import ai.synthai.businessbackend.application.service.SongTranscriptionService;
 import ai.synthai.businessbackend.domain.model.Category;
@@ -23,15 +25,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class AnalysisController {
     private final SongTranscriptionService songTranscriptionService;
     private final LectureTranscriptionService lectureTranscriptionService;
+    private final CallTranscriptionService callTranscriptionService;
+    private final AudiobookTranscriptionService audiobookTranscriptionService;
 
 
     @PostMapping("/song")
     public ResponseEntity<TranscriptionResponseDto> analyzeSong(
             @RequestParam("audioFile") MultipartFile audioFile,
             @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
-            @RequestParam("keycloakId") String keycloakId) {
+            @RequestParam("keycloakId") String keycloakId,
+            @RequestParam("title") String title) {
         try {
-            TranscriptionResponseDto response = songTranscriptionService.analyzeSong(audioFile, language, keycloakId);
+            TranscriptionResponseDto response = songTranscriptionService.analyzeSong(audioFile, language, keycloakId, title);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during song analysis", e);
@@ -50,9 +55,10 @@ public class AnalysisController {
     public ResponseEntity<TranscriptionResponseDto> analyzeLecture(
             @RequestParam("audioFile") MultipartFile audioFile,
             @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
-            @RequestParam("keycloakId") String keycloakId) {
+            @RequestParam("keycloakId") String keycloakId,
+            @RequestParam("title") String title) {
         try {
-            TranscriptionResponseDto response = lectureTranscriptionService.analyzeLecture(audioFile, language, keycloakId);
+            TranscriptionResponseDto response = lectureTranscriptionService.analyzeLecture(audioFile, language, keycloakId, title);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during lecture analysis", e);
@@ -66,12 +72,44 @@ public class AnalysisController {
     }
 
     @PostMapping("/audiobook")
-    public ResponseEntity<String> analyzeAudiobook() {
-        return ResponseEntity.ok("Audiobook analysis endpoint is working!");
+    public ResponseEntity<TranscriptionResponseDto> analyzeAudiobook(
+            @RequestParam("audioFile") MultipartFile audioFile,
+            @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
+            @RequestParam("keycloakId") String keycloakId,
+            @RequestParam("title") String title) {
+        try {
+            TranscriptionResponseDto response = lectureTranscriptionService.analyzeLecture(audioFile, language, keycloakId, title);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error during audiobook analysis", e);
+            return ResponseEntity.status(500).body(
+                    TranscriptionResponseDto
+                            .builder()
+                            .status(Status.FAILED)
+                            .category(Category.AUDIOBOOK)
+                            .language(language)
+                            .build());
+        }
     }
 
     @PostMapping("/call")
-    public ResponseEntity<String> analyzeCall() {
-        return ResponseEntity.ok("Call analysis endpoint is working!");
+    public ResponseEntity<TranscriptionResponseDto> analyzeCall(
+            @RequestParam("audioFile") MultipartFile audioFile,
+            @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
+            @RequestParam("keycloakId") String keycloakId,
+            @RequestParam("title") String title
+    ) {
+        try {
+            TranscriptionResponseDto response = callTranscriptionService.analyzeCall(audioFile, language, keycloakId, title);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error during call analysis", e);
+            return ResponseEntity.status(500).body(
+                    TranscriptionResponseDto.builder()
+                            .status(Status.FAILED)
+                            .category(Category.PHONE_CALL)
+                            .language(language)
+                            .build());
+        }
     }
 }

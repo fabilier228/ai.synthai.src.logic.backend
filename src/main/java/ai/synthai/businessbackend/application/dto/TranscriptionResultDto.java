@@ -10,6 +10,7 @@ import java.util.List;
 @Builder
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class TranscriptionResultDto {
 
     private long durationMilliseconds;

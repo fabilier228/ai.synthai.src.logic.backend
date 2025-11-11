@@ -31,7 +31,7 @@ public class SongTranscriptionService {
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
 
-    public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId) {
+    public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
             val musicResult = recognizeMusic(audioFile);
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG);
@@ -41,7 +41,7 @@ public class SongTranscriptionService {
 
             Transcription transcriptionToSave = Transcription.builder()
                     .keycloakId(keycloakId)
-                    .title(musicResult.isRecognized() ? musicResult.getTitle() : "Unknown")
+                    .title(title)
                     .category(Category.SONG.name())
                     .transcript(dialogue)
                     .summary(readyResponse.getSummary().toString())
@@ -57,6 +57,7 @@ public class SongTranscriptionService {
                     .duration(transcription.get("duration") instanceof Number ? ((Number) transcription.get("duration")).floatValue() : null)
                     .language(language)
                     .build();
+
         } catch (Exception e) {
             return TranscriptionResponseDto.builder()
                     .status(Status.FAILED)
