@@ -2,10 +2,10 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
 
-# Ścieżka do Twojego wytrenowanego modelu
+# Path to your trained model
 MODEL_DIR = "./results/xlmroberta_pl_en"
 
-# Wczytanie modelu i tokenizera (kompatybilne z różnymi modelami)
+# Load model and tokenizer (compatible with various models)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR)
@@ -17,7 +17,7 @@ def classify_text(texts, batch_size=16, return_probs=False, threshold=None):
     """
     texts: str or list[str]
     return_probs: if True returns dicts with label and probability distribution
-    threshold: optional float in (0,1); if provided and max_prob < threshold, label will be 'niepewne'
+    threshold: optional float in (0,1); if provided and max_prob < threshold, label will be 'uncertain'
     """
     single = False
     if isinstance(texts, str):
@@ -40,9 +40,9 @@ def classify_text(texts, batch_size=16, return_probs=False, threshold=None):
             for p_idx, prob in zip(preds, probs.tolist()):
                 max_prob = max(prob)
                 if threshold is not None and max_prob < threshold:
-                    label = "niepewne"
+                    label = "uncertain"
                 else:
-                    label = "pozytywny" if p_idx == 1 else "negatywny"
+                    label = "positive" if p_idx == 1 else "negative"
                 if return_probs:
                     results.append({"label": label, "probs": prob})
                 else:
@@ -52,6 +52,6 @@ def classify_text(texts, batch_size=16, return_probs=False, threshold=None):
 
 
 if __name__ == "__main__":
-    # szybki sanity-check
-    examples = ["To jest świetny produkt, polecam!", "Bardzo złe, nie polecam."]
+    # quick sanity-check
+    examples = ["This is a great product, I recommend it!", "Very bad, I do not recommend it."]
     print(classify_text(examples, return_probs=True))
