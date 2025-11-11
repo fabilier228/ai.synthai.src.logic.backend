@@ -1,7 +1,7 @@
 package ai.synthai.businessbackend.domain;
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
-import ai.synthai.businessbackend.domain.model.Phrase;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.Phrase;
 import lombok.val;
 
 import java.util.Comparator;
