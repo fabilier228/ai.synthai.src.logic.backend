@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TranscriptionResultDto {
 
-    private long durationMilliseconds;
+    private int durationMilliseconds;
 
     private List<CombinedPhrase> combinedPhrases;
 
