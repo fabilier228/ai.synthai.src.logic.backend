@@ -111,10 +111,4 @@ public class AnalysisController {
                             .build());
         }
     }
-
-    @PostMapping("/test")
-    public ResponseEntity<String> testEndpoint() {
-        log.info("Test endpoint reached");
-        return ResponseEntity.ok("Test endpoint is working!");
-    }
 }
