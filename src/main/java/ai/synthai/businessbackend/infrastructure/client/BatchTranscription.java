@@ -1,8 +1,11 @@
 package ai.synthai.businessbackend.infrastructure.client;
 
 
+import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.model.Category;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,15 +17,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BatchTranscription {
-    private static final String DEFAULT_LOCALE = "en-US,pl-PL";
-    private static final String TEMPLATE = "{\"locales\":[\"%s\"], \"diarizationEnabled\":%b}";
-
     private final RestTemplate restTemplate;
 
     @Value("${spring.azure.resources.speech.key}")
@@ -31,13 +32,12 @@ public class BatchTranscription {
     @Value("${spring.azure.resources.speech.region}")
     private String region;
 
-    public Map<String, Object> transcribeAudio(MultipartFile audioFile, Category category) {
-
+    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category) {
         try {
+            log.info("Starting transcription request to Speech API for category: {}", category);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Ocp-Apim-Subscription-Key", apiKey);
-
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
             body.add("audio", audioFile.getResource());
@@ -55,8 +55,8 @@ public class BatchTranscription {
             String fullUrl = createApiEndpoint();
 
             @SuppressWarnings("rawtypes")
-            ResponseEntity<LinkedHashMap> response = restTemplate.postForEntity(fullUrl, requestEntity, LinkedHashMap.class);
-
+            ResponseEntity<TranscriptionResultDto> response = restTemplate.postForEntity(fullUrl, requestEntity, TranscriptionResultDto.class);
+            log.info("Transcription response received with status code: {}", response.getStatusCode());
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
@@ -73,11 +73,21 @@ public class BatchTranscription {
 
     public String createLocales(Category category) {
         boolean diarization = switch (category) {
-            case SONG, PHONE_CALL -> true;
+            case SONG, CONVERSATION -> true;
             case AUDIOBOOK, LECTURE -> false;
         };
 
-        return String.format(TEMPLATE, DEFAULT_LOCALE, diarization);
+        String[] localesArray = new String[]{"en-US", "pl-PL"};
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("locales", localesArray);
+        map.put("diarizationEnabled", diarization);
+
+        try {
+            return new ObjectMapper().writeValueAsString(map);
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating locales JSON", e);
+        }
     }
 
 
