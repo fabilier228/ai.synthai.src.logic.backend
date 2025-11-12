@@ -1,22 +1,24 @@
 package ai.synthai.businessbackend.domain.model.analysis.summary;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 
 
 @Builder
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SongSummary {
     String title;
     String artist;
     String language;
     String genre;
-    List<String> genres;
+    List<String> themes;
     String tone;
     String perspective;
-    String adressee;
+    String addressee;
     String interpretation;
     List<String> emotions;
     List<String> symbolism;

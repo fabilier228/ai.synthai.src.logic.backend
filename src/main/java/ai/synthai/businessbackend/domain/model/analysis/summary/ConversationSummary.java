@@ -1,14 +1,18 @@
 package ai.synthai.businessbackend.domain.model.analysis.summary;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 
 @Builder
 @Getter
-public class CallSummary {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ConversationSummary {
     private List<String> participants;
     private String language;
     private String relationship;

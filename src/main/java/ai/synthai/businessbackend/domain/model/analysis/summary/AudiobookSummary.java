@@ -1,12 +1,16 @@
 package ai.synthai.businessbackend.domain.model.analysis.summary;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AudiobookSummary {
     private String title;
     private String author;
@@ -27,7 +31,6 @@ public class AudiobookSummary {
     private String audioStyle;
     private String soundDesign;
     private String targetAudience;
-    private Integer lengthMinutes;
     private String purpose;
     private String complexityLevel;
     private List<String> moodShifts;
