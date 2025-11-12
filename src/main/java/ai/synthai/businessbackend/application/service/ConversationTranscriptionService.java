@@ -1,7 +1,6 @@
 package ai.synthai.businessbackend.application.service;
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
-import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.TranscriptionUtils;
 import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;
@@ -56,7 +55,7 @@ public class ConversationTranscriptionService {
         } catch (Exception e) {
             return TranscriptionResponseDto.builder()
                     .status(Status.FAILED)
-                    .category(Category.SONG)
+                    .category(Category.CONVERSATION)
                     .language(language)
                     .build();
         }

@@ -2,7 +2,6 @@ package ai.synthai.businessbackend.application.service;
 
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
-import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.TranscriptionUtils;
 import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;
@@ -20,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -34,7 +31,7 @@ public class AudiobookTranscriptionService {
     public TranscriptionResponseDto analyzeAudiobook(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK);
-            val transcriptionContent = TranscriptionUtils.getText((TranscriptionResultDto) transcription);
+            val transcriptionContent = TranscriptionUtils.getText(transcription);
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent, AudiobookSummary.class);
             val readyResponse = buildResponse(analysis, transcriptionContent);
 
@@ -52,14 +49,14 @@ public class AudiobookTranscriptionService {
             return TranscriptionResponseDto.builder()
                     .status(Status.COMPLETED)
                     .transcriptionAnalysis(readyResponse)
-                    .category(Category.LECTURE)
+                    .category(Category.AUDIOBOOK)
                     .duration(transcription.getDurationMilliseconds())
                     .language(language)
                     .build();
         } catch (Exception e) {
             return TranscriptionResponseDto.builder()
                     .status(Status.FAILED)
-                    .category(Category.SONG)
+                    .category(Category.AUDIOBOOK)
                     .language(language)
                     .build();
         }
