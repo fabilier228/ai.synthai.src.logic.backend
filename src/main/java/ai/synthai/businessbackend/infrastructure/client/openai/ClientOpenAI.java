@@ -10,12 +10,14 @@ import com.azure.ai.openai.models.ChatRequestUserMessage;
 import com.azure.core.credential.AzureKeyCredential;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ClientOpenAI {
@@ -31,7 +33,7 @@ public class ClientOpenAI {
 
     private final PromptTemplateProvider promptTemplateProvider;
 
-    public Map<String, Object> getTranscriptionAnalysis(Category category, String transcript) {
+    public <T> T getTranscriptionAnalysis(Category category, String transcript, Class<T> responseType) {
         OpenAIClient client = createClient();
 
         String promptTemplate = promptTemplateProvider.templateByCategory(category, transcript);
@@ -49,7 +51,7 @@ public class ClientOpenAI {
                 .getContent();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(content, Map.class);
+            return objectMapper.readValue(content, responseType);
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse LLM response as JSON: " + content, e);
         }
