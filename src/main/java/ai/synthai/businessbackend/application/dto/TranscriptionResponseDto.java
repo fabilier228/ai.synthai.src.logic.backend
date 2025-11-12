@@ -10,6 +10,6 @@ public record TranscriptionResponseDto<T>(
         Status status,
         T transcriptionAnalysis,
         Category category,
-        Float duration,
+        int duration,
         Language language) {
 }
