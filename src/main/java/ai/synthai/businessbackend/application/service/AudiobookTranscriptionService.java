@@ -35,7 +35,7 @@ public class AudiobookTranscriptionService {
         try {
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK);
             val transcriptionContent = TranscriptionUtils.getText((TranscriptionResultDto) transcription);
-            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent);
+            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent, AudiobookSummary.class);
             val readyResponse = buildResponse(analysis, transcriptionContent);
 
             Transcription transcriptionToSave = Transcription.builder()
@@ -53,7 +53,7 @@ public class AudiobookTranscriptionService {
                     .status(Status.COMPLETED)
                     .transcriptionAnalysis(readyResponse)
                     .category(Category.LECTURE)
-                    .duration(transcription.get("duration") instanceof Number ? ((Number) transcription.get("duration")).floatValue() : null)
+                    .duration(transcription.getDurationMilliseconds())
                     .language(language)
                     .build();
         } catch (Exception e) {
@@ -65,37 +65,10 @@ public class AudiobookTranscriptionService {
         }
     }
 
-    private AudiobookTranscriptionAnalysis buildResponse(Map<String, Object> analysis, String transcriptionContent) {
-        AudiobookSummary audiobookSummary = AudiobookSummary.builder()
-                .title((String) analysis.get("title"))
-                .author((String) analysis.get("author"))
-                .narrator((String) analysis.get("narrator"))
-                .language((String) analysis.get("language"))
-                .genre((String) analysis.get("genre"))
-                .subGenres((List<String>) analysis.get("subGenres"))
-                .themes((List<String>) analysis.get("themes"))
-                .tone((String) analysis.get("tone"))
-                .narrativeStyle((String) analysis.get("narrativeStyle"))
-                .setting((String) analysis.get("setting"))
-                .mainCharacters((List<String>) analysis.get("mainCharacters"))
-                .plotSummary((String) analysis.get("plotSummary"))
-                .keyMoments((List<String>) analysis.get("keyMoments"))
-                .emotions((List<String>) analysis.get("emotions"))
-                .symbolism((List<String>) analysis.get("symbolism"))
-                .pacing((String) analysis.get("pacing"))
-                .audioStyle((String) analysis.get("audioStyle"))
-                .soundDesign((String) analysis.get("soundDesign"))
-                .targetAudience((String) analysis.get("targetAudience"))
-                .lengthMinutes(analysis.get("lengthMinutes") != null ? ((Number) analysis.get("lengthMinutes")).intValue() : null)
-                .purpose((String) analysis.get("purpose"))
-                .complexityLevel((String) analysis.get("complexityLevel"))
-                .moodShifts((List<String>) analysis.get("moodShifts"))
-                .narrativeArc((List<String>) analysis.get("narrativeArc"))
-                .build();
-
+    private AudiobookTranscriptionAnalysis buildResponse(AudiobookSummary analysis, String transcriptionContent) {
         return AudiobookTranscriptionAnalysis.builder()
                 .transcription(transcriptionContent)
-                .summary(audiobookSummary)
+                .summary(analysis)
                 .build();
     }
 }

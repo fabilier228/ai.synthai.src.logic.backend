@@ -7,6 +7,8 @@ import ai.synthai.businessbackend.domain.TranscriptionUtils;
 import ai.synthai.businessbackend.domain.model.*;
 import ai.synthai.businessbackend.domain.model.analysis.SongTranscriptionAnalysis;
 import ai.synthai.businessbackend.domain.model.analysis.summary.SongSummary;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.CombinedPhrase;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.Phrase;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import ai.synthai.businessbackend.infrastructure.client.AudDClient;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
@@ -33,11 +35,16 @@ public class SongTranscriptionService {
 
     public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
+            log.info("Starting song analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
             val musicResult = recognizeMusic(audioFile);
+            log.info("Music recognition result: {}", musicResult.getTitle());
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG);
-            val dialogue = TranscriptionUtils.createReadableDialogue((TranscriptionResultDto) transcription);
-            val analysis = (SongSummary) clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue);
-            val readyResponse = buildResponse((Map<String, Object>) analysis, musicResult, dialogue);
+            log.info("Transcription result received");
+            val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
+            log.info("Dialogue created from transcription");
+            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue, SongSummary.class);
+            log.info("Transcription analysis received from OpenAI");
+            val readyResponse = buildResponse(analysis, musicResult, dialogue);
 
             Transcription transcriptionToSave = Transcription.builder()
                     .keycloakId(keycloakId)
@@ -48,13 +55,15 @@ public class SongTranscriptionService {
                     .createdAt(LocalDateTime.now())
                     .build();
 
+            log.info("Saving transcription to repository");
             transcriptionRepositoryPort.save(transcriptionToSave);
+            log.info("Transcription saved successfully");
 
             return TranscriptionResponseDto.builder()
                     .status(Status.COMPLETED)
                     .transcriptionAnalysis(readyResponse)
                     .category(Category.SONG)
-                    .duration(transcription.get("duration") instanceof Number ? ((Number) transcription.get("duration")).floatValue() : null)
+                    .duration(transcription.getDurationMilliseconds())
                     .language(language)
                     .build();
 
@@ -89,31 +98,28 @@ public class SongTranscriptionService {
         return MusicRecognitionResultDto.builder().recognized(false).build();
     }
 
-    private SongTranscriptionAnalysis buildResponse(Map<String, Object> analysis, MusicRecognitionResultDto musicResult, String dialogue) {
+    private SongTranscriptionAnalysis buildResponse(SongSummary analysis, MusicRecognitionResultDto musicResult, String dialogue) {
         if (!musicResult.isRecognized()) {
             return SongTranscriptionAnalysis.builder()
                     .transcription(dialogue)
-                    .summary((SongSummary) analysis)
+                    .summary(analysis)
                     .build();
         }
 
-        SongSummary songSummary = SongSummary.builder()
-                .title(musicResult.getTitle())
-                .artist(musicResult.getArtist())
-                .language(analysis.get("language") != null ? analysis.get("language").toString() : null)
-                .genre(musicResult.getGenre())
-                .genres(analysis.get("genres") != null ? (List<String>) analysis.get("genres") : null)
-                .tone(analysis.get("tone") != null ? analysis.get("tone").toString() : null)
-                .perspective(analysis.get("perspective") != null ? analysis.get("perspective").toString() : null)
-                .adressee(analysis.get("adressee") != null ? analysis.get("adressee").toString() : null)
-                .interpretation(analysis.get("interpretation") != null ? analysis.get("interpretation").toString() : null)
-                .emotions(analysis.get("emotions") != null ? (List<String>) analysis.get("emotions") : null)
-                .symbolism(analysis.get("symbolism") != null ? (List<String>) analysis.get("symbolism") : null)
-                .build();
+        analysis.setTitle(musicResult.getTitle());
+        analysis.setArtist(musicResult.getArtist());
 
         return SongTranscriptionAnalysis.builder()
                 .transcription(dialogue)
-                .summary(songSummary)
+                .summary(analysis)
+                .build();
+    }
+
+    private TranscriptionResultDto mapToTranscriptionResult(Map<String, Object> map) {
+        return TranscriptionResultDto.builder()
+                .durationMilliseconds(map.get("durationMilliseconds") != null ? (int) map.get("durationMilliseconds") : 0)
+                .phrases(map.get("phrases") != null ? (List<Phrase>) map.get("phrases") : null)
+                .combinedPhrases(map.get("combinedPhrases") != null ? (List<CombinedPhrase>) map.get("combinedPhrases") : null)
                 .build();
     }
 

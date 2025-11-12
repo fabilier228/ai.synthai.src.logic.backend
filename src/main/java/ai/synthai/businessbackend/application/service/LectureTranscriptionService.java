@@ -31,7 +31,7 @@ public class LectureTranscriptionService {
         try {
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE);
             val transcriptionContent = TranscriptionUtils.getText((TranscriptionResultDto) transcription);
-            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.LECTURE, transcriptionContent);
+            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.LECTURE, transcriptionContent, LectureSummary.class);
             val readyResponse = buildResponse(analysis, transcriptionContent);
 
             Transcription transcriptionToSave = Transcription.builder()
@@ -49,7 +49,7 @@ public class LectureTranscriptionService {
                     .status(Status.COMPLETED)
                     .transcriptionAnalysis(readyResponse)
                     .category(Category.LECTURE)
-                    .duration(transcription.get("duration") instanceof Number ? ((Number) transcription.get("duration")).floatValue() : null)
+                    .duration(transcription.getDurationMilliseconds())
                     .language(language)
                     .build();
         } catch (Exception e) {
@@ -61,30 +61,10 @@ public class LectureTranscriptionService {
         }
     }
 
-    private LectureTranscriptionAnalysis buildResponse(Map<String, Object> analysis, String transcriptionContent) {
-        LectureSummary lectureSummary = LectureSummary.builder()
-                .title((String) analysis.get("title"))
-                .speaker((String) analysis.get("speaker"))
-                .language((String) analysis.get("language"))
-                .fieldOfStudy((String) analysis.get("fieldOfStudy"))
-                .topics((List<String>) analysis.get("topics"))
-                .keyConcepts((List<String>) analysis.get("keyConcepts"))
-                .tone((String) analysis.get("tone"))
-                .structure((List<String>) analysis.get("structure"))
-                .targetAudience((String) analysis.get("targetAudience"))
-                .summary((String) analysis.get("summary"))
-                .keyQuotes((List<String>) analysis.get("keyQuotes"))
-                .mainArgument((String) analysis.get("mainArgument"))
-                .evidenceAndExamples((List<String>) analysis.get("evidenceAndExamples"))
-                .conclusion((String) analysis.get("conclusion"))
-                .emotions((List<String>) analysis.get("emotions"))
-                .complexityLevel((String) analysis.get("complexityLevel"))
-                .purpose((String) analysis.get("purpose"))
-                .build();
-
+    private LectureTranscriptionAnalysis buildResponse(LectureSummary analysis, String transcriptionContent) {
         return LectureTranscriptionAnalysis.builder()
                 .transcription(transcriptionContent)
-                .summary(lectureSummary)
+                .summary(analysis)
                 .build();
     }
 
