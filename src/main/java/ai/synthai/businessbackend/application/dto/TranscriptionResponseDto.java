@@ -2,12 +2,14 @@ package ai.synthai.businessbackend.application.dto;
 
 import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;
-import ai.synthai.businessbackend.domain.model.TranscriptionAnalysis;
+import ai.synthai.businessbackend.domain.model.Status;
+import lombok.Builder;
 
-public record TranscriptionResponseDto(
-        String status,
-        TranscriptionAnalysis transcriptionAnalysis,
+@Builder
+public record TranscriptionResponseDto<T>(
+        Status status,
+        T transcriptionAnalysis,
         Category category,
-        Float duration,
+        int duration,
         Language language) {
 }
