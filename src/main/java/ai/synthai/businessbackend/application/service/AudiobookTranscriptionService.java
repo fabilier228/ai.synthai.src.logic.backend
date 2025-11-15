@@ -30,7 +30,7 @@ public class AudiobookTranscriptionService {
 
     public TranscriptionResponseDto analyzeAudiobook(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK);
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK, language);
             val transcriptionContent = TranscriptionUtils.getText(transcription);
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent, AudiobookSummary.class);
             val readyResponse = buildResponse(analysis, transcriptionContent);

@@ -3,6 +3,7 @@ package ai.synthai.businessbackend.infrastructure.client;
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.model.Category;
+import ai.synthai.businessbackend.domain.model.Language;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class BatchTranscription {
     @Value("${spring.azure.resources.speech.region}")
     private String region;
 
-    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category) {
+    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category, Language language) {
         try {
             log.info("Starting transcription request to Speech API for category: {}", category);
             HttpHeaders headers = new HttpHeaders();
@@ -42,7 +43,7 @@ public class BatchTranscription {
 
             body.add("audio", audioFile.getResource());
 
-            String definitionJson = createLocales(category);
+            String definitionJson = createLocales(category, language);
 
             HttpHeaders definitionHeaders = new HttpHeaders();
             definitionHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -71,13 +72,18 @@ public class BatchTranscription {
         return String.format("https://%s.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15", region);
     }
 
-    public String createLocales(Category category) {
+    public String createLocales(Category category, Language language) {
         boolean diarization = switch (category) {
             case SONG, CONVERSATION -> true;
             case AUDIOBOOK, LECTURE -> false;
         };
 
-        String[] localesArray = new String[]{"en-US", "pl-PL"};
+        String[] localesArray;
+        if (language.equals(Language.POLISH)) {
+            localesArray = new String[]{"pl-PL"};
+        } else {
+            localesArray = new String[]{"en-US"};
+        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("locales", localesArray);

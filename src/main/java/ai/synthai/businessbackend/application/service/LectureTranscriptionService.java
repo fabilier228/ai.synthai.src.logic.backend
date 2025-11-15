@@ -26,7 +26,7 @@ public class LectureTranscriptionService {
 
     public TranscriptionResponseDto analyzeLecture(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE);
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE, language);
             val transcriptionContent = TranscriptionUtils.getText(transcription);
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.LECTURE, transcriptionContent, LectureSummary.class);
             val readyResponse = buildResponse(analysis, transcriptionContent);

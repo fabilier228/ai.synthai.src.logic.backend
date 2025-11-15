@@ -29,7 +29,7 @@ public class ConversationTranscriptionService {
 
     public TranscriptionResponseDto analyzeConversation(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.CONVERSATION);
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.CONVERSATION, language);
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.CONVERSATION, dialogue, ConversationSummary.class);
             val readyResponse = buildResponse(analysis, dialogue);

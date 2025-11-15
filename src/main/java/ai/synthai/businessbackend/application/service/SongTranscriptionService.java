@@ -38,7 +38,7 @@ public class SongTranscriptionService {
             log.info("Starting song analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
             val musicResult = recognizeMusic(audioFile);
             log.info("Music recognition result: {}", musicResult.getTitle());
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG);
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG, language);
             log.info("Transcription result received");
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             log.info("Dialogue created from transcription");
