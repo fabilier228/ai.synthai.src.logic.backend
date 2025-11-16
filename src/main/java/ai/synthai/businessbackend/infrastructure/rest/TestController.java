@@ -1,21 +1,27 @@
 package ai.synthai.businessbackend.infrastructure.rest;
 
-import ai.synthai.businessbackend.domain.model.Category;
-import ai.synthai.businessbackend.infrastructure.client.openai.ClientOpenAI;
+import ai.synthai.businessbackend.domain.model.Transcription;
+import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import lombok.AllArgsConstructor;
+import lombok.val;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @AllArgsConstructor
+@RequestMapping("test")
 public class TestController {
 
-    private  final ClientOpenAI clientOpenAI;
+    private final TranscriptionRespositoryPort transcriptionRespositoryPort;
 
-    @PostMapping("/test/analysis")
-    public String testAnalysis(@RequestBody String transcription, Category category) {
-        return "Test analysis endpoint is working!";
+    @GetMapping("/get-all")
+    public ResponseEntity<List<Transcription>> testAnalysis() {
+        val entities = transcriptionRespositoryPort.findAll();
+        return ResponseEntity.status(200).body(entities);
     }
 
 }
