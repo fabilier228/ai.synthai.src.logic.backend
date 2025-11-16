@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public final class TranscriptionMapper {
 
-    public TranscriptionEntity toEntity(final Transcription transcription) {
+    public static TranscriptionEntity toEntity(final Transcription transcription) {
         TranscriptionEntity entity = new TranscriptionEntity();
         entity.setId(transcription.getId());
         entity.setKeycloakId(transcription.getKeycloakId());
@@ -21,7 +21,7 @@ public final class TranscriptionMapper {
         return entity;
     }
 
-    public Transcription toDomain(final TranscriptionEntity transcriptionEntity) {
+    public static Transcription toDomain(final TranscriptionEntity transcriptionEntity) {
         return Transcription.builder()
             .id(transcriptionEntity.getId())
             .keycloakId(transcriptionEntity.getKeycloakId())
