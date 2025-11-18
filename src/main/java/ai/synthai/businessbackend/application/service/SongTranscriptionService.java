@@ -13,6 +13,7 @@ import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryP
 import ai.synthai.businessbackend.infrastructure.client.AudDClient;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
 import ai.synthai.businessbackend.infrastructure.client.openai.ClientOpenAI;
+import ai.synthai.businessbackend.infrastructure.persistence.TranscriptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -32,6 +33,7 @@ public class SongTranscriptionService {
     private final BatchTranscription batchTranscription;
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
+    private final TranscriptionMapper transcriptionMapper;
 
     public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
@@ -51,7 +53,7 @@ public class SongTranscriptionService {
                     .title(title)
                     .category(Category.SONG.name())
                     .transcript(dialogue)
-                    .summary(readyResponse.getSummary().toString())
+                    .summary(TranscriptionMapper.summaryToJsonString(readyResponse.getSummary()))
                     .createdAt(LocalDateTime.now())
                     .build();
 

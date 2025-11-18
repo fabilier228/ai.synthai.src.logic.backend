@@ -11,6 +11,7 @@ import ai.synthai.businessbackend.domain.model.analysis.summary.ConversationSumm
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
 import ai.synthai.businessbackend.infrastructure.client.openai.ClientOpenAI;
+import ai.synthai.businessbackend.infrastructure.persistence.TranscriptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -39,7 +40,7 @@ public class ConversationTranscriptionService {
                     .title(title)
                     .category(Category.CONVERSATION.name())
                     .transcript(dialogue)
-                    .summary(readyResponse.getSummary().toString())
+                    .summary(TranscriptionMapper.summaryToJsonString(readyResponse.getSummary()))
                     .createdAt(LocalDateTime.now())
                     .build();
 
