@@ -1,0 +1,118 @@
+@host = http://localhost:8081/api/v1
+@keycloakId = user-uuid-1234-5678
+@contentType = multipart/form-data; boundary=WebAppBoundary
+
+### ============================================================================
+### ANALYSIS CONTROLLER (File Uploads)
+### Requires a file named 'sample.mp3' in the same directory as this .http file
+### ============================================================================
+
+### 1. Song Analysis
+POST {{host}}/analysis/song
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+
+< ./piosenka1.mp3
+--WebAppBoundary
+Content-Disposition: form-data; name="title"
+
+Bohemian Rhapsody
+--WebAppBoundary
+Content-Disposition: form-data; name="keycloakId"
+
+{{keycloakId}}
+--WebAppBoundary
+Content-Disposition: form-data; name="language"
+
+ENGLISH
+--WebAppBoundary--
+
+### 2. Lecture Analysis
+POST {{host}}/analysis/lecture
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+
+< ./sample.mp3
+--WebAppBoundary
+Content-Disposition: form-data; name="title"
+
+Introduction to Quantum Physics
+--WebAppBoundary
+Content-Disposition: form-data; name="keycloakId"
+
+{{keycloakId}}
+--WebAppBoundary
+Content-Disposition: form-data; name="language"
+
+EN
+--WebAppBoundary--
+
+### 3. Audiobook Analysis
+POST {{host}}/analysis/audiobook
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="audioFile"; filename="audiobook.mp3"
+
+< ./audiobook.mp3
+--WebAppBoundary
+Content-Disposition: form-data; name="title"
+
+spider story
+--WebAppBoundary
+Content-Disposition: form-data; name="keycloakId"
+
+{{keycloakId}}
+--WebAppBoundary
+Content-Disposition: form-data; name="language"
+
+ENGLISH
+--WebAppBoundary--
+
+### 4. Conversation Analysis
+POST {{host}}/analysis/conversation
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+
+< ./sample.mp3
+--WebAppBoundary
+Content-Disposition: form-data; name="title"
+
+Business Meeting Q3
+--WebAppBoundary
+Content-Disposition: form-data; name="keycloakId"
+
+{{keycloakId}}
+--WebAppBoundary
+Content-Disposition: form-data; name="language"
+
+EN
+--WebAppBoundary--
+
+
+### ============================================================================
+### TRANSCRIPTION CONTROLLER (Result Management)
+### ============================================================================
+
+### 5. Get all transcriptions for a specific user (KeycloakId)
+GET {{host}}/transcriptions/user/{{keycloakId}}
+Accept: application/json
+
+### 6. Get details of a single transcription by ID (Long)
+# Change '1' to an ID that actually exists in your DB
+GET {{host}}/transcriptions/1
+Accept: application/json
+
+### 7. Delete transcription by ID
+DELETE {{host}}/transcriptions/1
+Accept: application/json
+
+### 8. Get all transcriptions in the system (Admin check)
+GET {{host}}/test/get-all
+Accept: application/json
