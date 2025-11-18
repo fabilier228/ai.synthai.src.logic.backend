@@ -6,11 +6,13 @@ import ai.synthai.businessbackend.infrastructure.persistence.entity.Transcriptio
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class TranscriptionRepositoryFacade implements TranscriptionRespositoryPort {
 
     private final TranscriptionJpaRepository transcriptionJpaRepository;
@@ -22,7 +24,9 @@ public class TranscriptionRepositoryFacade implements TranscriptionRespositoryPo
     }
 
     @Override
-    public void deleteById(final Long id) {}
+    public void deleteById(final Long id) {
+        transcriptionJpaRepository.deleteById(id);
+    }
 
     @Override
     public List<Transcription> findByKeycloakId(final String keycloakId) {
@@ -32,6 +36,11 @@ public class TranscriptionRepositoryFacade implements TranscriptionRespositoryPo
         return entities.stream()
             .map(TranscriptionMapper::toDomain)
             .toList();
+    }
+
+    @Override
+    public Transcription findById(final Long id) {
+        return TranscriptionMapper.toDomain(transcriptionJpaRepository.findTranscriptionEntityById(id));
     }
 
     @Override

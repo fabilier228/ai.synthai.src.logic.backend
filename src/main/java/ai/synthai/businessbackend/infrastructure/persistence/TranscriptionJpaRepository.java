@@ -14,6 +14,12 @@ public interface TranscriptionJpaRepository extends JpaRepository<TranscriptionE
     List<TranscriptionEntity> findByKeycloakId(
         String keycloakId
     );
+
     @NotNull
+    TranscriptionEntity findTranscriptionEntityById(
+        Long id
+    );
+    @NotNull
+    @Override
     List<TranscriptionEntity> findAll();
 }

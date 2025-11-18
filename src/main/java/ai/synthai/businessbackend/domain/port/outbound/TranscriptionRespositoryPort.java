@@ -10,5 +10,7 @@ public interface TranscriptionRespositoryPort {
 
     void deleteById(Long id);
     List<Transcription> findByKeycloakId(String id);
+
+    Transcription findById(Long id);
     List<Transcription> findAll();
 }
