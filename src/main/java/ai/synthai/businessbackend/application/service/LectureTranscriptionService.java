@@ -8,6 +8,7 @@ import ai.synthai.businessbackend.domain.model.analysis.summary.LectureSummary;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
 import ai.synthai.businessbackend.infrastructure.client.openai.ClientOpenAI;
+import ai.synthai.businessbackend.infrastructure.persistence.TranscriptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -36,7 +37,7 @@ public class LectureTranscriptionService {
                     .title(title)
                     .category(Category.LECTURE.name())
                     .transcript(transcriptionContent)
-                    .summary(readyResponse.getSummary().toString())
+                    .summary(TranscriptionMapper.summaryToJsonString(readyResponse.getSummary()))
                     .createdAt(LocalDateTime.now())
                     .build();
 
