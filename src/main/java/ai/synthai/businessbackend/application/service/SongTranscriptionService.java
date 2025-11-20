@@ -70,6 +70,7 @@ public class SongTranscriptionService {
                     .build();
 
         } catch (Exception e) {
+            log.error("Error during song transcription analysis", e);
             return TranscriptionResponseDto.builder()
                     .status(Status.FAILED)
                     .category(Category.SONG)

@@ -27,9 +27,13 @@ public class LectureTranscriptionService {
 
     public TranscriptionResponseDto analyzeLecture(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
+            log.info("Starting lecture analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
             val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE, language);
+            log.info("Transcription result received");
             val transcriptionContent = TranscriptionUtils.getText(transcription);
+            log.info("Transcription content extracted");
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.LECTURE, transcriptionContent, LectureSummary.class);
+            log.info("Transcription analysis received from OpenAI");
             val readyResponse = buildResponse(analysis, transcriptionContent);
 
             Transcription transcriptionToSave = Transcription.builder()
@@ -51,6 +55,7 @@ public class LectureTranscriptionService {
                     .language(language)
                     .build();
         } catch (Exception e) {
+            log.error("Error during song transcription analysis", e);
             return TranscriptionResponseDto.builder()
                     .status(Status.FAILED)
                     .category(Category.LECTURE)
