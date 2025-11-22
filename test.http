@@ -56,9 +56,9 @@ POST {{host}}/analysis/audiobook
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="audioFile"; filename="audiobook.mp3"
+Content-Disposition: form-data; name="audioFile"; filename="kubus.mp3"
 
-< ./audiobook.mp3
+< ./kubus.mp3
 --WebAppBoundary
 Content-Disposition: form-data; name="title"
 
@@ -70,7 +70,7 @@ Content-Disposition: form-data; name="keycloakId"
 --WebAppBoundary
 Content-Disposition: form-data; name="language"
 
-ENGLISH
+POLISH
 --WebAppBoundary--
 
 ### 4. Conversation Analysis
@@ -116,3 +116,7 @@ Accept: application/json
 ### 8. Get all transcriptions in the system (Admin check)
 GET {{host}}/test/get-all
 Accept: application/json
+
+### 9. Download transcription file
+GET {{host}}/transcriptions/1/download?language=POLISH
+Accept: application/pdf

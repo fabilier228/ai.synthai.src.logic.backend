@@ -4,6 +4,13 @@ import ai.synthai.businessbackend.domain.model.Category;
 import org.springframework.stereotype.Component;
 @Component
 public class PromptTemplateProvider {
+    private static final String outputLanguageInstruction = """
+        IMPORTANT LANGUAGE RULES:
+        1. Detect the language of the input transcript.
+        2. The VALUES inside the JSON must be in the same language as the transcript (e.g., if input is Polish, summary and analysis must be in Polish).
+        3. The KEYS of the JSON (e.g., "title", "summary", "tone") MUST remain in English exactly as defined in the schema.
+        4. Do not translate the structure, only the content.
+        """;
     public String templateByCategory(Category category, String transcript) {
         return switch (category) {
             case CONVERSATION -> getConversationTemplate(transcript);
@@ -44,7 +51,9 @@ public class PromptTemplateProvider {
                 - Always return valid JSON — no comments or trailing commas.
                 - Ensure arrays are valid JSON arrays, even if empty.
                 - Do NOT include markdown, explanations, or text outside the JSON object.
-                """.formatted(transcript);
+                
+                %s
+                """.formatted(transcript, outputLanguageInstruction);
     }
 
     private String getConversationTemplate(String transcript) {
@@ -74,7 +83,9 @@ public class PromptTemplateProvider {
                 - Always return valid JSON — no comments or trailing commas.
                 - Arrays must always be valid JSON arrays (even if empty).
                 - Do NOT include markdown, explanations, or text outside the JSON object.
-                """.formatted(transcript);
+                
+                %s
+                """.formatted(transcript, outputLanguageInstruction);
     }
 
     private String getLectureTemplate(String transcript) {
@@ -110,7 +121,9 @@ public class PromptTemplateProvider {
                 - Always return valid JSON — no comments or trailing commas.
                 - Arrays must always be valid JSON arrays (even if empty).
                 - Do NOT include markdown, explanations, or text outside the JSON object.
-                """.formatted(transcript);
+                
+                %s
+                """.formatted(transcript, outputLanguageInstruction);
     }
 
     private String getAudiobookTemplate(String transcript) {
@@ -139,8 +152,6 @@ public class PromptTemplateProvider {
                   "emotions": [string],                     // Dominant emotions conveyed in the narration
                   "symbolism": [string],                    // Major symbols or motifs and their meanings
                   "pacing": string,                         // Narrative pacing (e.g. "slow", "moderate", "fast")
-                  "audioStyle": string,                     // Style of narration (e.g. "calm", "expressive", "neutral", "theatrical")
-                  "soundDesign": string | null,             // Description of sound design or background effects, if any
                   "targetAudience": string,                 // Intended audience (e.g. "young adults", "general readers", "professionals")
                   "purpose": string,                        // Main purpose (e.g. "entertain", "educate", "inspire", "inform")
                   "complexityLevel": string,                // Comprehension or conceptual difficulty (e.g. "basic", "intermediate", "advanced"),
@@ -153,6 +164,8 @@ public class PromptTemplateProvider {
                 - Always return valid JSON — no comments or trailing commas.
                 - Arrays must always be valid JSON arrays (even if empty).
                 - Do NOT include markdown, explanations, or text outside the JSON object.
-                """.formatted(transcript);
+                
+                %s
+                """.formatted(transcript, outputLanguageInstruction);
     }
 }

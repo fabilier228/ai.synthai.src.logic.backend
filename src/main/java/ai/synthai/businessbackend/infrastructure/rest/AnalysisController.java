@@ -23,11 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Slf4j
 public class AnalysisController {
-
-    //TODO: refactor saving entities to DB, method .toString on class instance creates:
-    //"ai.synthai.businessbackend.domain.model.analysis.summary.AudiobookSummary@4c1fb66b"
-    //TODO: should implement proper toString methods or use a mapper in Summary classes
-
     private final SongTranscriptionService songTranscriptionService;
     private final LectureTranscriptionService lectureTranscriptionService;
     private final ConversationTranscriptionService conversationTranscriptionService;
