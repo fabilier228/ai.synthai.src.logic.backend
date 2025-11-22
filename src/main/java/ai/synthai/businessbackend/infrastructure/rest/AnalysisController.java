@@ -30,6 +30,7 @@ public class AnalysisController {
     private final LectureTranscriptionService lectureTranscriptionService;
     private final ConversationTranscriptionService conversationTranscriptionService;
     private final AudiobookTranscriptionService audiobookTranscriptionService;
+    private final EmotionalTranscriptionService emotionalTranscriptionService;
     @PostMapping("/song")
     public ResponseEntity<TranscriptionResponseDto> analyzeSong(
             @RequestParam("audioFile") MultipartFile audioFile,
