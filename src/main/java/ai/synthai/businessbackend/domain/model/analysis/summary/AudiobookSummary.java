@@ -28,8 +28,6 @@ public class AudiobookSummary {
     private List<String> emotions;
     private List<String> symbolism;
     private String pacing;
-    private String audioStyle;
-    private String soundDesign;
     private String targetAudience;
     private String purpose;
     private String complexityLevel;
