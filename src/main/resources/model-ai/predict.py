@@ -5,7 +5,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
 
 # Path to your trained model
-MODEL_DIR = os.path.abspath("src/main/resources/model-ai/results/xlmroberta_pl_en")
+MODEL_DIR = "Sylwia454/emotion"
 
 # Load model and tokenizer (compatible with various models)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

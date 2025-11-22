@@ -6,16 +6,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class EmotionalTranscriptionService {
-    public EmotionalTranscriptionAnalysis analyzeEmotion(MultipartFile audioFile) {
+    public EmotionalTranscriptionAnalysis analyzeEmotion(MultipartFile textFile) {
         String transcription = "";
         String emotion = "uncertain";
         java.io.File tempFile = null;
         try {
-            // Save audio to temp file
-            tempFile = java.io.File.createTempFile("audio", ".wav");
-            audioFile.transferTo(tempFile);
+            // Save text to temp file
+                tempFile = java.io.File.createTempFile("text", ".txt");
+                textFile.transferTo(tempFile);
 
-            // Call Python model with audio file path
+            // Call Python model with text file path
             ProcessBuilder pb = new ProcessBuilder(
                 "python3", "src/main/resources/model-ai/predict.py", tempFile.getAbsolutePath()
             );

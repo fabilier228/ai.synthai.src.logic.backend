@@ -122,9 +122,9 @@ public class AnalysisController {
     }
 
     @PostMapping("/emotion")
-    public ResponseEntity<EmotionalTranscriptionResponseDto> analyzeEmotion(
-        @RequestParam("audioFile") MultipartFile audioFile) {
-            EmotionalTranscriptionAnalysis analysis = emotionalTranscriptionService.analyzeEmotion(audioFile);
+        public ResponseEntity<EmotionalTranscriptionResponseDto> analyzeEmotion(
+            @RequestParam("textFile") MultipartFile textFile) {
+                EmotionalTranscriptionAnalysis analysis = emotionalTranscriptionService.analyzeEmotion(textFile);
             EmotionalTranscriptionResponseDto dto = EmotionalTranscriptionResponseDto.builder()
             .transcription(analysis.getTranscription())
             .emotion(analysis.getEmotion())
