@@ -1,6 +1,5 @@
 package ai.synthai.businessbackend.infrastructure.client;
 
-
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;

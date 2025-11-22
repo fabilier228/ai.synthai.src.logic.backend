@@ -1,9 +1,11 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
 
 # Path to your trained model
-MODEL_DIR = "./results/xlmroberta_pl_en"
+MODEL_DIR = os.path.abspath("src/main/resources/model-ai/results/xlmroberta_pl_en")
 
 # Load model and tokenizer (compatible with various models)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -52,6 +54,20 @@ def classify_text(texts, batch_size=16, return_probs=False, threshold=None):
 
 
 if __name__ == "__main__":
-    # quick sanity-check
-    examples = ["This is a great product, I recommend it!", "Very bad, I do not recommend it."]
-    print(classify_text(examples, return_probs=True))
+    import sys
+    if len(sys.argv) > 1:
+        # Assume first argument is text file path
+        text_path = sys.argv[1]
+        with open(text_path, "r", encoding="utf-8") as f:
+            text = f.read().strip()
+        result = classify_text(text, return_probs=True)
+        if isinstance(result, dict):
+            print(result["label"])
+        elif isinstance(result, list):
+            print(result[0]["label"])
+        else:
+            print(result)
+    else:
+        # quick sanity-check
+        examples = ["This is a great product, I recommend it!", "Very bad, I do not recommend it."]
+        print(classify_text(examples, return_probs=True))
