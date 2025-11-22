@@ -1,19 +1,18 @@
 package ai.synthai.businessbackend.application.dto;
 
-import ai.synthai.businessbackend.domain.model.CombinedPhrase;
-import ai.synthai.businessbackend.domain.model.Phrase;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.CombinedPhrase;
+import ai.synthai.businessbackend.domain.model.batch.transcription.response.Phrase;
+import lombok.*;
 
 import java.util.List;
 
 @Data
-@NoArgsConstructor
+@Builder
+@Getter
 @AllArgsConstructor
 public class TranscriptionResultDto {
 
-    private long durationMilliseconds;
+    private int durationMilliseconds;
 
     private List<CombinedPhrase> combinedPhrases;
 

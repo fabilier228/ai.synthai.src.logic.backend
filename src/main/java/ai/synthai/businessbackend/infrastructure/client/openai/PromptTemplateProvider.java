@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 public class PromptTemplateProvider {
     public String templateByCategory(Category category, String transcript) {
         return switch (category) {
-            case PHONE_CALL -> getConversationTemplate(transcript);
+            case CONVERSATION -> getConversationTemplate(transcript);
             case SONG -> getSongTemplate(transcript);
             case AUDIOBOOK -> getAudiobookTemplate(transcript);
             case LECTURE -> getLectureTemplate(transcript);
@@ -36,7 +36,7 @@ public class PromptTemplateProvider {
                   "addressee": string,               // Who the lyrics are addressed to (e.g. "lover", "society", "self")
                   "interpretation": string,          // 1–3 sentence summary of the song’s meaning or message
                   "emotions": [string],              // Dominant emotions conveyed (e.g. ["sadness", "hope"])
-                  "symbolism": [string]              // Key symbols and their interpretations
+                  "symbolism": [string]
                 }
 
                 Formatting rules:
@@ -63,10 +63,6 @@ public class PromptTemplateProvider {
                   "context": string,                       // Context or setting of the conversation (e.g. "at work", "at home", "online chat")
                   "topics": [string],                      // Main topics discussed (e.g. ["vacation", "job change"])
                   "tone": string,                          // Overall tone of the conversation (e.g. "friendly", "tense", "formal")
-                  "speakerRoles": {                        // Roles or communication styles of each participant
-                    "personA": string,                     // e.g. "dominant", "listener", "mediator"
-                    "personB": string                      // e.g. "passive", "assertive", "emotional"
-                  },
                   "summary": string,                       // Short summary (1–3 sentences) describing the flow and key points of the conversation
                   "emotions": [string],                    // Dominant emotions expressed (e.g. ["anger", "joy", "nervousness"])
                   "conflictLevel": string,                 // Qualitative level of disagreement (e.g. "none", "mild", "moderate", "strong")
@@ -108,7 +104,6 @@ public class PromptTemplateProvider {
                   "emotions": [string],                  // Emotional tone or sentiment expressed (e.g. ["inspiring", "neutral", "critical"])
                   "complexityLevel": string,             // Difficulty level (e.g. "basic", "intermediate", "advanced")
                   "purpose": string,                     // Main purpose of the lecture (e.g. "educate", "motivate", "explain theory")
-                  "durationMinutes": number | null       // Approximate duration in minutes, if mentioned; otherwise null
                 }
                 Formatting rules:
                 - Use `null` (not the string "null") for missing or unknown values.
@@ -147,7 +142,6 @@ public class PromptTemplateProvider {
                   "audioStyle": string,                     // Style of narration (e.g. "calm", "expressive", "neutral", "theatrical")
                   "soundDesign": string | null,             // Description of sound design or background effects, if any
                   "targetAudience": string,                 // Intended audience (e.g. "young adults", "general readers", "professionals")
-                  "lengthMinutes": number | null,           // Approximate duration in minutes, if known; otherwise null
                   "purpose": string,                        // Main purpose (e.g. "entertain", "educate", "inspire", "inform")
                   "complexityLevel": string,                // Comprehension or conceptual difficulty (e.g. "basic", "intermediate", "advanced"),
                   "moodShifts": [string],                   // Notable emotional or tonal shifts throughout the audiobook

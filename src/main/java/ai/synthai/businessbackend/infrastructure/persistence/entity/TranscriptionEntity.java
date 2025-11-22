@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,12 +35,10 @@ public class TranscriptionEntity {
     @Column(nullable = false)
     private String category;
 
-    @Lob
-    @Column
+    @Column(columnDefinition = "text", nullable = true)
     private String transcript;
 
-    @Lob
-    @Column
+    @Column(columnDefinition = "text", nullable = true)
     private String summary;
 
     @Column(name = "created_at", nullable = false)

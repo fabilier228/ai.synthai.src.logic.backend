@@ -1,11 +1,11 @@
-package ai.synthai.businessbackend.domain.model;
+package ai.synthai.businessbackend.application.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class MusicRecognitionResult {
+public class MusicRecognitionResultDto {
     private final String title;
     private final String artist;
     private final String album;

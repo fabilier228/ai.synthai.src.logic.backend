@@ -1,12 +1,16 @@
 package ai.synthai.businessbackend.domain.port.outbound;
 
 import ai.synthai.businessbackend.domain.model.Transcription;
-import ai.synthai.businessbackend.infrastructure.persistence.entity.TranscriptionEntity;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface TranscriptionRespositoryPort {
-    void save(TranscriptionEntity transcription);
-    void deleteBydId(Long id);
-    Optional<Transcription> findByKeycloakId(String id);
+
+    void save(Transcription transcription);
+
+    void deleteById(Long id);
+    List<Transcription> findByKeycloakId(String id);
+
+    Transcription findById(Long id);
+    List<Transcription> findAll();
 }

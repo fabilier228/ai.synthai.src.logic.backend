@@ -28,9 +28,6 @@
             <column name="created_at" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="updated_at" type="TIMESTAMP">
-                <constraints nullable="true"/>
-            </column>
         </createTable>
 
         <createIndex indexName="idx_transcription_user" tableName="transcription">

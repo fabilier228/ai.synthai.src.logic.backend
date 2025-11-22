@@ -2,14 +2,18 @@ package ai.synthai.businessbackend.infrastructure.persistence;
 
 import ai.synthai.businessbackend.domain.model.Transcription;
 import ai.synthai.businessbackend.infrastructure.persistence.entity.TranscriptionEntity;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-@NoArgsConstructor
 public final class TranscriptionMapper {
 
-    public TranscriptionEntity toEntity(final Transcription transcription) {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static TranscriptionEntity toEntity(final Transcription transcription) {
         TranscriptionEntity entity = new TranscriptionEntity();
         entity.setId(transcription.getId());
         entity.setKeycloakId(transcription.getKeycloakId());
@@ -21,7 +25,7 @@ public final class TranscriptionMapper {
         return entity;
     }
 
-    public Transcription toDomain(final TranscriptionEntity transcriptionEntity) {
+    public static Transcription toDomain(final TranscriptionEntity transcriptionEntity) {
         return Transcription.builder()
             .id(transcriptionEntity.getId())
             .keycloakId(transcriptionEntity.getKeycloakId())
@@ -33,5 +37,15 @@ public final class TranscriptionMapper {
                 transcriptionEntity.getCreatedAt()
             )
             .build();
+    }
+
+    public static String summaryToJsonString(final Object summaryObject) {
+        if (summaryObject == null) return null;
+        try {
+            return objectMapper.writeValueAsString(summaryObject);
+        } catch (JsonProcessingException e) {
+            log.error("Error serializing summary to JSON", e);
+            return "{}";
+        }
     }
 }
