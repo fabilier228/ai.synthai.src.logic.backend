@@ -3,11 +3,16 @@ package ai.synthai.businessbackend.infrastructure.rest;
 import ai.synthai.businessbackend.application.dto.DeleteTranscriptionResponseDto;
 import ai.synthai.businessbackend.application.dto.KeycloakIdTranscriptionsDto;
 import ai.synthai.businessbackend.application.dto.SingleTranscriptionDto;
+import ai.synthai.businessbackend.application.service.TranscriptionFileService;
+import ai.synthai.businessbackend.domain.model.Language;
 import ai.synthai.businessbackend.domain.model.Status;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class TranscriptionController {
     private final TranscriptionRespositoryPort transcriptionRespositoryPort;
+    private final TranscriptionFileService transcriptionFileService;
 
     @GetMapping("/user/{keycloakId}")
     public ResponseEntity<KeycloakIdTranscriptionsDto> getTranscriptionsByKeycloakId(@PathVariable String keycloakId) {
@@ -72,6 +78,27 @@ public class TranscriptionController {
                     .status(Status.FAILED)
                     .transcription(null)
                     .build());
+        }
+    }
+
+    @GetMapping("/{transcriptionId}/download")
+    public ResponseEntity<ByteArrayResource> sendTranscriptionFileById(
+            @PathVariable Long transcriptionId,
+            @RequestParam(defaultValue = "ENGLISH") Language language) {
+        try {
+            var multipartFile = transcriptionFileService.createTranscriptionFile(transcriptionId, language);
+
+            ByteArrayResource resource = new ByteArrayResource(multipartFile.getBytes());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + multipartFile.getOriginalFilename() + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .contentLength(multipartFile.getSize())
+                    .body(resource);
+
+        } catch (Exception e) {
+            log.error("Error downloading transcription with id {}: {}", transcriptionId, e.getMessage());
+            return ResponseEntity.status(500).build();
         }
     }
 }
