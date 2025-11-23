@@ -1,4 +1,4 @@
-@host = http://localhost:8081/api/v1
+@host = http://localhost:8081/
 @keycloakId = user-uuid-1234-5678
 @contentType = multipart/form-data; boundary=WebAppBoundary
 
@@ -78,9 +78,9 @@ POST {{host}}/analysis/conversation
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+Content-Disposition: form-data; name="audioFile"; filename="conversation.mp3"
 
-< ./sample.mp3
+< ./conversation.mp3
 --WebAppBoundary
 Content-Disposition: form-data; name="title"
 
@@ -92,7 +92,7 @@ Content-Disposition: form-data; name="keycloakId"
 --WebAppBoundary
 Content-Disposition: form-data; name="language"
 
-EN
+ENGLISH
 --WebAppBoundary--
 
 

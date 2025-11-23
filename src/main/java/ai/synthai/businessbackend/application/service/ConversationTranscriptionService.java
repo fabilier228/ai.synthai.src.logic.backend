@@ -10,6 +10,7 @@ import ai.synthai.businessbackend.domain.model.analysis.ConversationTranscriptio
 import ai.synthai.businessbackend.domain.model.analysis.summary.ConversationSummary;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
+import ai.synthai.businessbackend.infrastructure.client.EmotionRecognition;
 import ai.synthai.businessbackend.infrastructure.client.openai.ClientOpenAI;
 import ai.synthai.businessbackend.infrastructure.persistence.TranscriptionMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -27,6 +29,7 @@ public class ConversationTranscriptionService {
     private final BatchTranscription batchTranscription;
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
+    private final EmotionRecognition emotionRecognition;
 
     public TranscriptionResponseDto analyzeConversation(MultipartFile audioFile, Language language, String keycloakId, String title) {
         try {
@@ -35,9 +38,11 @@ public class ConversationTranscriptionService {
             log.info("Transcription result received");
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             log.info("Dialogue created from transcription");
+            val detectedEmotion = emotionRecognition.recognizeEmotion(TranscriptionUtils.getText(transcription));
+            log.info("Detected emotion: {}", detectedEmotion);
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.CONVERSATION, dialogue, ConversationSummary.class);
             log.info("Transcription analysis received from OpenAI");
-            val readyResponse = buildResponse(analysis, dialogue);
+            val readyResponse = buildResponse(analysis, dialogue, detectedEmotion);
 
             Transcription transcriptionToSave = Transcription.builder()
                     .keycloakId(keycloakId)
@@ -58,7 +63,7 @@ public class ConversationTranscriptionService {
                     .language(language)
                     .build();
         } catch (Exception e) {
-            log.error("Error during song transcription analysis", e);
+            log.error("Error during conversation transcription analysis", e);
             return TranscriptionResponseDto.builder()
                     .status(Status.FAILED)
                     .category(Category.CONVERSATION)
@@ -68,7 +73,8 @@ public class ConversationTranscriptionService {
     }
 
 
-    private ConversationTranscriptionAnalysis buildResponse(ConversationSummary analysis, String dialogue) {
+    private ConversationTranscriptionAnalysis buildResponse(ConversationSummary analysis, String dialogue, String detectedEmotion) {
+        analysis.setEmotions(List.of(detectedEmotion));
         return ConversationTranscriptionAnalysis.builder()
                 .transcription(dialogue)
                 .summary(analysis)
