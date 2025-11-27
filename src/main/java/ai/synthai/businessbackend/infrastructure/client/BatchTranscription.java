@@ -73,7 +73,7 @@ public class BatchTranscription {
     }
 
     public String createLocales(Category category, Language language) {
-        boolean diarization = switch (category) {
+        boolean isDiarizationEnabled = switch (category) {
             case SONG, CONVERSATION -> true;
             case AUDIOBOOK, LECTURE -> false;
         };
@@ -85,12 +85,18 @@ public class BatchTranscription {
             localesArray = new String[]{"en-US"};
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("locales", localesArray);
-        map.put("diarizationEnabled", diarization);
+        Map<String, Object> definitionMap = new HashMap<>();
+        definitionMap.put("locales", localesArray);
+
+        if (isDiarizationEnabled) {
+            Map<String, Object> diarizationSettings = new HashMap<>();
+            diarizationSettings.put("enabled", true);
+
+            definitionMap.put("diarization", diarizationSettings);
+        }
 
         try {
-            return new ObjectMapper().writeValueAsString(map);
+            return new ObjectMapper().writeValueAsString(definitionMap);
         } catch (Exception e) {
             throw new RuntimeException("Error creating locales JSON", e);
         }
