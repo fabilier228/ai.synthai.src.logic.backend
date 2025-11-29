@@ -119,13 +119,5 @@ public class SongTranscriptionService {
                 .build();
     }
 
-    private TranscriptionResultDto mapToTranscriptionResult(Map<String, Object> map) {
-        return TranscriptionResultDto.builder()
-                .durationMilliseconds(map.get("durationMilliseconds") != null ? (int) map.get("durationMilliseconds") : 0)
-                .phrases(map.get("phrases") != null ? (List<Phrase>) map.get("phrases") : null)
-                .combinedPhrases(map.get("combinedPhrases") != null ? (List<CombinedPhrase>) map.get("combinedPhrases") : null)
-                .build();
-    }
-
 
 }
