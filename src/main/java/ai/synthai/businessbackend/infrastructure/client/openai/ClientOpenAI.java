@@ -33,14 +33,15 @@ public class ClientOpenAI {
 
     private final PromptTemplateProvider promptTemplateProvider;
 
-    public <T> T getTranscriptionAnalysis(Category category, String transcript, Class<T> responseType) {
+    public <T> T getTranscriptionAnalysis(Category category, String transcript, Class<T> responseType, double temperature) {
         OpenAIClient client = createClient();
 
         String promptTemplate = promptTemplateProvider.templateByCategory(category, transcript);
 
         List<ChatRequestMessage> messages = buildChatMessage(promptTemplate);
 
-        ChatCompletionsOptions options = new ChatCompletionsOptions(messages);
+        ChatCompletionsOptions options = new ChatCompletionsOptions(messages)
+                .setTemperature(temperature);
 
         ChatCompletions chatCompletions = client.getChatCompletions(deploymentName, options);
 
