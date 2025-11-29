@@ -2,7 +2,6 @@ package ai.synthai.businessbackend.infrastructure.client;
 
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
-import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -33,9 +33,8 @@ public class BatchTranscription {
     @Value("${spring.azure.resources.speech.region}")
     private String region;
 
-    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category, Language language) {
+    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, boolean diarization, Language language, List<String> phraseList) {
         try {
-            log.info("Starting transcription request to Speech API for category: {}", category);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Ocp-Apim-Subscription-Key", apiKey);
@@ -43,7 +42,7 @@ public class BatchTranscription {
 
             body.add("audio", audioFile.getResource());
 
-            String definitionJson = createLocales(category, language);
+            String definitionJson = createLocales(diarization, language, phraseList);
 
             HttpHeaders definitionHeaders = new HttpHeaders();
             definitionHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -72,11 +71,7 @@ public class BatchTranscription {
         return String.format("https://%s.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15", region);
     }
 
-    public String createLocales(Category category, Language language) {
-        boolean isDiarizationEnabled = switch (category) {
-            case SONG, CONVERSATION -> true;
-            case AUDIOBOOK, LECTURE -> false;
-        };
+    public String createLocales(Boolean isDiarizationEnabled, Language language, List<String> phraseList) {
 
         String[] localesArray;
         if (language.equals(Language.POLISH)) {
@@ -93,6 +88,10 @@ public class BatchTranscription {
             diarizationSettings.put("enabled", true);
 
             definitionMap.put("diarization", diarizationSettings);
+        }
+
+        if (phraseList != null && !phraseList.isEmpty()) {
+            definitionMap.put("phraseList", phraseList);
         }
 
         try {

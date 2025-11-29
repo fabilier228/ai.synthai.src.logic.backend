@@ -35,16 +35,17 @@ public class SongTranscriptionService {
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
     private final TranscriptionMapper transcriptionMapper;
 
-    public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId,
+                                                String title, double temperature, boolean diarization, List<String> phraseList) {
         try {
             log.info("Starting song analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
             val musicResult = recognizeMusic(audioFile);
             log.info("Music recognition result: {}", musicResult.getTitle());
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG, language);
+            val transcription = batchTranscription.transcribeAudio(audioFile, diarization, language, phraseList);
             log.info("Transcription result received");
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             log.info("Dialogue created from transcription");
-            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue, SongSummary.class);
+            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue, SongSummary.class, temperature);
             log.info("Transcription analysis received from OpenAI");
             val readyResponse = buildResponse(analysis, musicResult, dialogue);
 
@@ -115,14 +116,6 @@ public class SongTranscriptionService {
         return SongTranscriptionAnalysis.builder()
                 .transcription(dialogue)
                 .summary(analysis)
-                .build();
-    }
-
-    private TranscriptionResultDto mapToTranscriptionResult(Map<String, Object> map) {
-        return TranscriptionResultDto.builder()
-                .durationMilliseconds(map.get("durationMilliseconds") != null ? (int) map.get("durationMilliseconds") : 0)
-                .phrases(map.get("phrases") != null ? (List<Phrase>) map.get("phrases") : null)
-                .combinedPhrases(map.get("combinedPhrases") != null ? (List<CombinedPhrase>) map.get("combinedPhrases") : null)
                 .build();
     }
 

@@ -1,18 +1,33 @@
-@host = http://localhost:8081/
+@host = http://localhost:8081/api/v1
 @keycloakId = user-uuid-1234-5678
 @contentType = multipart/form-data; boundary=WebAppBoundary
 
 ### ============================================================================
-### ANALYSIS CONTROLLER (File Uploads)
-### Requires a file named 'sample.mp3' in the same directory as this .http file
+### 1. LANGUAGE DETECTION (NEW)
+### Endpoint: /detect-language
 ### ============================================================================
 
-### 1. Song Analysis
-POST {{host}}/analysis/song
+POST {{host}}/detect-language
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
 Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+
+< ./kubus.mp3
+--WebAppBoundary--
+
+
+### ============================================================================
+### 2. ANALYSIS CONTROLLER
+### Endpoints: /analysis/*
+### ============================================================================
+
+### 2.1 Song Analysis
+POST {{host}}/analysis/song
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="audioFile"; filename="piosenka1.mp3"
 
 < ./piosenka1.mp3
 --WebAppBoundary
@@ -27,14 +42,22 @@ Content-Disposition: form-data; name="keycloakId"
 Content-Disposition: form-data; name="language"
 
 ENGLISH
+--WebAppBoundary
+Content-Disposition: form-data; name="temperature"
+
+0.5
+--WebAppBoundary
+Content-Disposition: form-data; name="diarization"
+
+false
 --WebAppBoundary--
 
-### 2. Lecture Analysis
+### 2.2 Lecture Analysis (with phraseList example)
 POST {{host}}/analysis/lecture
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="audioFile"; filename="sample.mp3"
+Content-Disposition: form-data; name="audioFile"; filename="wyklad.mp3"
 
 < ./sample.mp3
 --WebAppBoundary
@@ -49,9 +72,17 @@ Content-Disposition: form-data; name="keycloakId"
 Content-Disposition: form-data; name="language"
 
 EN
+--WebAppBoundary
+Content-Disposition: form-data; name="phraseList"
+
+quantum
+--WebAppBoundary
+Content-Disposition: form-data; name="phraseList"
+
+physics
 --WebAppBoundary--
 
-### 3. Audiobook Analysis
+### 2.3 Audiobook Analysis
 POST {{host}}/analysis/audiobook
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
@@ -62,7 +93,7 @@ Content-Disposition: form-data; name="audioFile"; filename="kubus.mp3"
 --WebAppBoundary
 Content-Disposition: form-data; name="title"
 
-spider story
+Spider Story
 --WebAppBoundary
 Content-Disposition: form-data; name="keycloakId"
 
@@ -73,7 +104,7 @@ Content-Disposition: form-data; name="language"
 POLISH
 --WebAppBoundary--
 
-### 4. Conversation Analysis
+### 2.4 Conversation Analysis
 POST {{host}}/analysis/conversation
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
@@ -93,30 +124,33 @@ Content-Disposition: form-data; name="keycloakId"
 Content-Disposition: form-data; name="language"
 
 ENGLISH
+--WebAppBoundary
+Content-Disposition: form-data; name="diarization"
+
+true
 --WebAppBoundary--
 
 
 ### ============================================================================
-### TRANSCRIPTION CONTROLLER (Result Management)
+### 3. TRANSCRIPTION MANAGEMENT (READ/DELETE)
 ### ============================================================================
 
-### 5. Get all transcriptions for a specific user (KeycloakId)
+### 3.1 Get all transcriptions for a specific user
 GET {{host}}/transcriptions/user/{{keycloakId}}
 Accept: application/json
 
-### 6. Get details of a single transcription by ID (Long)
-# Change '1' to an ID that actually exists in your DB
+### 3.2 Get details of a single transcription by ID
 GET {{host}}/transcriptions/1
 Accept: application/json
 
-### 7. Delete transcription by ID
+### 3.3 Delete transcription by ID
 DELETE {{host}}/transcriptions/1
 Accept: application/json
 
-### 8. Get all transcriptions in the system (Admin check)
+### 3.4 Get all transcriptions (Admin/Test)
 GET {{host}}/test/get-all
 Accept: application/json
 
-### 9. Download transcription file
+### 3.5 Download transcription file (PDF)
 GET {{host}}/transcriptions/1/download?language=POLISH
 Accept: application/pdf
