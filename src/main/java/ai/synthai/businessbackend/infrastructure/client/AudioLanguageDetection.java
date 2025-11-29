@@ -26,15 +26,6 @@ public class AudioLanguageDetection {
     private String serviceUrl;
 
     public String detectLanguage(byte[] audioFile) {
-
-        log.info("--- DEBUG DEEPGRAM ---");
-        log.info("API Key loaded: {}", (apiKey != null && !apiKey.isBlank()) ? "YES (Length: " + apiKey.length() + ")" : "NO/NULL");
-        log.info("Audio size: {} bytes", audioFile != null ? audioFile.length : 0);
-        log.info("Target URL: {}", serviceUrl);
-
-        if (apiKey == null || apiKey.isBlank()) {
-            throw new RuntimeException("API Key is missing! Check application.properties");
-        }
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.valueOf("audio/wav"));
