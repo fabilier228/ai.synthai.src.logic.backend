@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -29,14 +30,15 @@ public class AudiobookTranscriptionService {
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
 
-    public TranscriptionResponseDto analyzeAudiobook(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeAudiobook(MultipartFile audioFile, Language language, String keycloakId,
+                                                     String title, double temperature, boolean diarization, List<String> phraseList) {
         try {
             log.info("Starting audiobook analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK, language);
+            val transcription = batchTranscription.transcribeAudio(audioFile, diarization, language, phraseList);
             log.info("Transcription result received");
             val transcriptionContent = TranscriptionUtils.getText(transcription);
             log.info("Transcription content extracted");
-            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent, AudiobookSummary.class);
+            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent, AudiobookSummary.class, temperature);
             log.info("Transcription analysis received from OpenAI");
             val readyResponse = buildResponse(analysis, transcriptionContent);
 

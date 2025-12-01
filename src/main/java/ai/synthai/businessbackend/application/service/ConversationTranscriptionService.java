@@ -31,16 +31,17 @@ public class ConversationTranscriptionService {
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
     private final EmotionRecognition emotionRecognition;
 
-    public TranscriptionResponseDto analyzeConversation(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeConversation(MultipartFile audioFile, Language language, String keycloakId,
+                                                        String title, double temperature, boolean diarization, List<String> phraseList) {
         try {
             log.info("Starting conversation analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.CONVERSATION, language);
+            val transcription = batchTranscription.transcribeAudio(audioFile, diarization, language, phraseList);
             log.info("Transcription result received");
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             log.info("Dialogue created from transcription");
             val detectedEmotion = emotionRecognition.recognizeEmotion(TranscriptionUtils.getText(transcription));
             log.info("Detected emotion: {}", detectedEmotion);
-            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.CONVERSATION, dialogue, ConversationSummary.class);
+            val analysis = clientOpenAI.getTranscriptionAnalysis(Category.CONVERSATION, dialogue, ConversationSummary.class, temperature);
             log.info("Transcription analysis received from OpenAI");
             val readyResponse = buildResponse(analysis, dialogue, detectedEmotion);
 
