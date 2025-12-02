@@ -37,7 +37,12 @@ public class ConversationTranscriptionService {
             log.info("Starting conversation analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
             val transcription = batchTranscription.transcribeAudio(audioFile, diarization, language, phraseList);
             log.info("Transcription result received");
-            val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
+            String dialogue;
+            if (diarization) {
+                dialogue = TranscriptionUtils.createReadableDialogue(transcription);
+            } else {
+                dialogue = TranscriptionUtils.getText(transcription);
+            }
             log.info("Dialogue created from transcription");
             val detectedEmotion = emotionRecognition.recognizeEmotion(TranscriptionUtils.getText(transcription));
             log.info("Detected emotion: {}", detectedEmotion);

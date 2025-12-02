@@ -2,13 +2,10 @@ package ai.synthai.businessbackend.application.service;
 
 import ai.synthai.businessbackend.application.dto.MusicRecognitionResultDto;
 import ai.synthai.businessbackend.application.dto.TranscriptionResponseDto;
-import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
 import ai.synthai.businessbackend.domain.TranscriptionUtils;
 import ai.synthai.businessbackend.domain.model.*;
 import ai.synthai.businessbackend.domain.model.analysis.SongTranscriptionAnalysis;
 import ai.synthai.businessbackend.domain.model.analysis.summary.SongSummary;
-import ai.synthai.businessbackend.domain.model.batch.transcription.response.CombinedPhrase;
-import ai.synthai.businessbackend.domain.model.batch.transcription.response.Phrase;
 import ai.synthai.businessbackend.domain.port.outbound.TranscriptionRespositoryPort;
 import ai.synthai.businessbackend.infrastructure.client.AudDClient;
 import ai.synthai.businessbackend.infrastructure.client.BatchTranscription;
@@ -33,7 +30,6 @@ public class SongTranscriptionService {
     private final BatchTranscription batchTranscription;
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
-    private final TranscriptionMapper transcriptionMapper;
 
     public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId,
                                                 String title, double temperature, boolean diarization, List<String> phraseList) {
@@ -43,7 +39,14 @@ public class SongTranscriptionService {
             log.info("Music recognition result: {}", musicResult.getTitle());
             val transcription = batchTranscription.transcribeAudio(audioFile, diarization, language, phraseList);
             log.info("Transcription result received");
-            val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
+
+            String dialogue;
+            if (diarization) {
+                dialogue = TranscriptionUtils.createReadableDialogue(transcription);
+            } else {
+                dialogue = TranscriptionUtils.getText(transcription);
+            }
+
             log.info("Dialogue created from transcription");
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.SONG, dialogue, SongSummary.class, temperature);
             log.info("Transcription analysis received from OpenAI");

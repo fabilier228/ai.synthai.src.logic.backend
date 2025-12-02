@@ -36,7 +36,12 @@ public class AudiobookTranscriptionService {
             log.info("Starting audiobook analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
             val transcription = batchTranscription.transcribeAudio(audioFile, diarization, language, phraseList);
             log.info("Transcription result received");
-            val transcriptionContent = TranscriptionUtils.getText(transcription);
+            String transcriptionContent;
+            if (diarization) {
+                transcriptionContent = TranscriptionUtils.createReadableDialogue(transcription);
+            } else {
+                transcriptionContent = TranscriptionUtils.getText(transcription);
+            }
             log.info("Transcription content extracted");
             val analysis = clientOpenAI.getTranscriptionAnalysis(Category.AUDIOBOOK, transcriptionContent, AudiobookSummary.class, temperature);
             log.info("Transcription analysis received from OpenAI");

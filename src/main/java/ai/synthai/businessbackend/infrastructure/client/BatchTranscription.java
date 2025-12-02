@@ -38,29 +38,32 @@ public class BatchTranscription {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Ocp-Apim-Subscription-Key", apiKey);
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-            body.add("audio", audioFile.getResource());
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
             String definitionJson = createLocales(diarization, language, phraseList);
 
             HttpHeaders definitionHeaders = new HttpHeaders();
-            definitionHeaders.setContentType(MediaType.APPLICATION_JSON);
+            definitionHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
             HttpEntity<String> definitionPart = new HttpEntity<>(definitionJson, definitionHeaders);
+
             body.add("definition", definitionPart);
+
+            body.add("audio", audioFile.getResource());
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
             String fullUrl = createApiEndpoint();
 
-            @SuppressWarnings("rawtypes")
+            log.info("Wysyłanie definition JSON: {}", definitionJson);
+
             ResponseEntity<TranscriptionResultDto> response = restTemplate.postForEntity(fullUrl, requestEntity, TranscriptionResultDto.class);
-            log.info("Transcription response received with status code: {}", response.getStatusCode());
+
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RuntimeException("Speech API returned empty or unsuccessful response: " + response.getStatusCode());
+                throw new RuntimeException("Speech API error: " + response.getStatusCode());
             }
         } catch (Exception e) {
             throw new RuntimeException("Error during transcription request", e);
