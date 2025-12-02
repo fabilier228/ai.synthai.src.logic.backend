@@ -91,7 +91,9 @@ public class BatchTranscription {
         }
 
         if (phraseList != null && !phraseList.isEmpty()) {
-            definitionMap.put("phraseList", phraseList);
+            Map<String, Object> phraseListObj = new HashMap<>();
+            phraseListObj.put("phrases", phraseList);
+            definitionMap.put("phraseList", phraseListObj);
         }
 
         try {
