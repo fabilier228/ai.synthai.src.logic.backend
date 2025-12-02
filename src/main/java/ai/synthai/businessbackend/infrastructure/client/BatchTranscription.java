@@ -93,11 +93,11 @@ public class BatchTranscription {
             definitionMap.put("diarization", diarizationSettings);
         }
 
-        if (phraseList != null && !phraseList.isEmpty()) {
-            Map<String, Object> phraseListObj = new HashMap<>();
-            phraseListObj.put("phrases", phraseList);
-            definitionMap.put("phraseList", phraseListObj);
-        }
+        // if (phraseList != null && !phraseList.isEmpty()) {
+        //     Map<String, Object> phraseListObj = new HashMap<>();
+        //     phraseListObj.put("phrases", phraseList);
+        //     definitionMap.put("phraseList", phraseListObj);
+        // }
 
         try {
             return new ObjectMapper().writeValueAsString(definitionMap);
