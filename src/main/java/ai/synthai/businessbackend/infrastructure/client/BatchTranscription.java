@@ -2,7 +2,6 @@ package ai.synthai.businessbackend.infrastructure.client;
 
 
 import ai.synthai.businessbackend.application.dto.TranscriptionResultDto;
-import ai.synthai.businessbackend.domain.model.Category;
 import ai.synthai.businessbackend.domain.model.Language;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -33,35 +33,37 @@ public class BatchTranscription {
     @Value("${spring.azure.resources.speech.region}")
     private String region;
 
-    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category, Language language, String phraseList) {
+    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, boolean diarization, Language language, List<String> phraseList) {
         try {
-            log.info("Starting transcription request to Speech API for category: {}, phraseList: {}", category, phraseList != null ? "provided" : "none");
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Ocp-Apim-Subscription-Key", apiKey);
+
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-            body.add("audio", audioFile.getResource());
-
-            String definitionJson = createLocales(category, language, phraseList);
+            String definitionJson = createLocales(diarization, language, phraseList);
 
             HttpHeaders definitionHeaders = new HttpHeaders();
-            definitionHeaders.setContentType(MediaType.APPLICATION_JSON);
+            definitionHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
             HttpEntity<String> definitionPart = new HttpEntity<>(definitionJson, definitionHeaders);
+
             body.add("definition", definitionPart);
+
+            body.add("audio", audioFile.getResource());
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
             String fullUrl = createApiEndpoint();
 
-            @SuppressWarnings("rawtypes")
+            log.info("Wysyłanie definition JSON: {}", definitionJson);
+
             ResponseEntity<TranscriptionResultDto> response = restTemplate.postForEntity(fullUrl, requestEntity, TranscriptionResultDto.class);
-            log.info("Transcription response received with status code: {}", response.getStatusCode());
+
             if (response.getStatusCode().is2xxSuccessful()) {
                 return response.getBody();
             } else {
-                throw new RuntimeException("Speech API returned empty or unsuccessful response: " + response.getStatusCode());
+                throw new RuntimeException("Speech API error: " + response.getStatusCode());
             }
         } catch (Exception e) {
             throw new RuntimeException("Error during transcription request", e);
@@ -72,11 +74,7 @@ public class BatchTranscription {
         return String.format("https://%s.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15", region);
     }
 
-    public String createLocales(Category category, Language language, String phraseList) {
-        boolean isDiarizationEnabled = switch (category) {
-            case SONG, CONVERSATION -> true;
-            case AUDIOBOOK, LECTURE -> false;
-        };
+    public String createLocales(Boolean isDiarizationEnabled, Language language, List<String> phraseList) {
 
         String[] localesArray;
         if (language.equals(Language.POLISH)) {
@@ -95,24 +93,10 @@ public class BatchTranscription {
             definitionMap.put("diarization", diarizationSettings);
         }
 
-        // Add phrase list if provided
-        if (phraseList != null && !phraseList.trim().isEmpty()) {
-            String[] phrases = phraseList.trim().split("\n");
-            java.util.List<String> cleanedPhrases = new java.util.ArrayList<>();
-            
-            for (String phrase : phrases) {
-                String trimmed = phrase.trim();
-                if (!trimmed.isEmpty()) {
-                    cleanedPhrases.add(trimmed);
-                }
-            }
-            
-            if (!cleanedPhrases.isEmpty()) {
-                log.info("Adding {} custom phrases to transcription request", cleanedPhrases.size());
-                Map<String, Object> phraseListSettings = new HashMap<>();
-                phraseListSettings.put("phrases", cleanedPhrases);
-                definitionMap.put("phraseList", phraseListSettings);
-            }
+        if (phraseList != null && !phraseList.isEmpty()) {
+            Map<String, Object> phraseListObj = new HashMap<>();
+            phraseListObj.put("phrases", phraseList);
+            definitionMap.put("phraseList", phraseListObj);
         }
 
         try {
