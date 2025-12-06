@@ -32,10 +32,11 @@ public class AnalysisController {
             @RequestParam("audioFile") MultipartFile audioFile,
             @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
             @RequestParam("keycloakId") String keycloakId,
-            @RequestParam("title") String title) {
+            @RequestParam("title") String title,
+            @RequestParam(value = "phraseList", required = false) String phraseList) {
         try {
-            log.info("Received song analysis request: keycloakId={}, title={}, language={}", keycloakId, title, language);
-            TranscriptionResponseDto response = songTranscriptionService.analyzeSong(audioFile, language, keycloakId, title);
+            log.info("Received song analysis request: keycloakId={}, title={}, language={}, phraseList={}", keycloakId, title, language, phraseList != null ? "provided" : "none");
+            TranscriptionResponseDto response = songTranscriptionService.analyzeSong(audioFile, language, keycloakId, title, phraseList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during song analysis", e);
@@ -55,9 +56,10 @@ public class AnalysisController {
             @RequestParam("audioFile") MultipartFile audioFile,
             @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
             @RequestParam("keycloakId") String keycloakId,
-            @RequestParam("title") String title) {
+            @RequestParam("title") String title,
+            @RequestParam(value = "phraseList", required = false) String phraseList) {
         try {
-            TranscriptionResponseDto response = lectureTranscriptionService.analyzeLecture(audioFile, language, keycloakId, title);
+            TranscriptionResponseDto response = lectureTranscriptionService.analyzeLecture(audioFile, language, keycloakId, title, phraseList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during lecture analysis", e);
@@ -75,9 +77,10 @@ public class AnalysisController {
             @RequestParam("audioFile") MultipartFile audioFile,
             @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
             @RequestParam("keycloakId") String keycloakId,
-            @RequestParam("title") String title) {
+            @RequestParam("title") String title,
+            @RequestParam(value = "phraseList", required = false) String phraseList) {
         try {
-            TranscriptionResponseDto response = audiobookTranscriptionService.analyzeAudiobook(audioFile, language, keycloakId, title);
+            TranscriptionResponseDto response = audiobookTranscriptionService.analyzeAudiobook(audioFile, language, keycloakId, title, phraseList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during audiobook analysis", e);
@@ -96,10 +99,11 @@ public class AnalysisController {
             @RequestParam("audioFile") MultipartFile audioFile,
             @RequestParam(value = "language", required = false, defaultValue = "EN") Language language,
             @RequestParam("keycloakId") String keycloakId,
-            @RequestParam("title") String title
+            @RequestParam("title") String title,
+            @RequestParam(value = "phraseList", required = false) String phraseList
     ) {
         try {
-            TranscriptionResponseDto response = conversationTranscriptionService.analyzeConversation(audioFile, language, keycloakId, title);
+            TranscriptionResponseDto response = conversationTranscriptionService.analyzeConversation(audioFile, language, keycloakId, title, phraseList);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error during call analysis", e);

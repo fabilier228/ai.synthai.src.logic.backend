@@ -35,12 +35,12 @@ public class SongTranscriptionService {
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
     private final TranscriptionMapper transcriptionMapper;
 
-    public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeSong(MultipartFile audioFile, Language language, String keycloakId, String title, String phraseList) {
         try {
-            log.info("Starting song analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
+            log.info("Starting song analysis for keycloakId={}, title={}, language={}, phraseList={}", keycloakId, title, language, phraseList != null ? "provided" : "none");
             val musicResult = recognizeMusic(audioFile);
             log.info("Music recognition result: {}", musicResult.getTitle());
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG, language);
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.SONG, language, phraseList);
             log.info("Transcription result received");
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             log.info("Dialogue created from transcription");

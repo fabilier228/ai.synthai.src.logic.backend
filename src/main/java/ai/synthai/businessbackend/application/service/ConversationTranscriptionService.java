@@ -31,10 +31,16 @@ public class ConversationTranscriptionService {
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
     private final EmotionRecognition emotionRecognition;
 
-    public TranscriptionResponseDto analyzeConversation(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeConversation(
+            MultipartFile audioFile,
+            Language language,
+            String keycloakId,
+            String title,
+            String phraseList) {
         try {
-            log.info("Starting conversation analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.CONVERSATION, language);
+            log.info("Starting conversation analysis for keycloakId={}, title={}, language={}, phraseList={}",
+                    keycloakId, title, language, phraseList != null ? "provided" : "none");
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.CONVERSATION, language, phraseList);
             log.info("Transcription result received");
             val dialogue = TranscriptionUtils.createReadableDialogue(transcription);
             log.info("Dialogue created from transcription");

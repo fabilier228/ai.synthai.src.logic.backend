@@ -25,10 +25,10 @@ public class LectureTranscriptionService {
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
 
-    public TranscriptionResponseDto analyzeLecture(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeLecture(MultipartFile audioFile, Language language, String keycloakId, String title, String phraseList) {
         try {
-            log.info("Starting lecture analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE, language);
+            log.info("Starting lecture analysis for keycloakId={}, title={}, language={}, phraseList={}", keycloakId, title, language, phraseList != null ? "provided" : "none");
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.LECTURE, language, phraseList);
             log.info("Transcription result received");
             val transcriptionContent = TranscriptionUtils.getText(transcription);
             log.info("Transcription content extracted");

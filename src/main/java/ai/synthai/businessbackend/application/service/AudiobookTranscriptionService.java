@@ -29,10 +29,10 @@ public class AudiobookTranscriptionService {
     private final ClientOpenAI clientOpenAI;
     private final TranscriptionRespositoryPort transcriptionRepositoryPort;
 
-    public TranscriptionResponseDto analyzeAudiobook(MultipartFile audioFile, Language language, String keycloakId, String title) {
+    public TranscriptionResponseDto analyzeAudiobook(MultipartFile audioFile, Language language, String keycloakId, String title, String phraseList) {
         try {
-            log.info("Starting audiobook analysis for keycloakId={}, title={}, language={}", keycloakId, title, language);
-            val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK, language);
+            log.info("Starting audiobook analysis for keycloakId={}, title={}, language={}, phraseList={}", keycloakId, title, language, phraseList != null ? "provided" : "none");
+            val transcription = batchTranscription.transcribeAudio(audioFile, Category.AUDIOBOOK, language, phraseList);
             log.info("Transcription result received");
             val transcriptionContent = TranscriptionUtils.getText(transcription);
             log.info("Transcription content extracted");

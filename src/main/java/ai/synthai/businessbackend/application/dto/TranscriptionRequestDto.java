@@ -6,7 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record TranscriptionRequestDto(Category category,
                                       MultipartFile audioFile,
-                                      Language language) {
+                                      Language language,
+                                      String phraseList) {
 
 
 }

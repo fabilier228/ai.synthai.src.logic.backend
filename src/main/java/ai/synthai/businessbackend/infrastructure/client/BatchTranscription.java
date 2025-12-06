@@ -33,9 +33,9 @@ public class BatchTranscription {
     @Value("${spring.azure.resources.speech.region}")
     private String region;
 
-    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category, Language language) {
+    public TranscriptionResultDto transcribeAudio(MultipartFile audioFile, Category category, Language language, String phraseList) {
         try {
-            log.info("Starting transcription request to Speech API for category: {}", category);
+            log.info("Starting transcription request to Speech API for category: {}, phraseList: {}", category, phraseList != null ? "provided" : "none");
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Ocp-Apim-Subscription-Key", apiKey);
@@ -43,7 +43,7 @@ public class BatchTranscription {
 
             body.add("audio", audioFile.getResource());
 
-            String definitionJson = createLocales(category, language);
+            String definitionJson = createLocales(category, language, phraseList);
 
             HttpHeaders definitionHeaders = new HttpHeaders();
             definitionHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -72,7 +72,7 @@ public class BatchTranscription {
         return String.format("https://%s.api.cognitive.microsoft.com/speechtotext/transcriptions:transcribe?api-version=2025-10-15", region);
     }
 
-    public String createLocales(Category category, Language language) {
+    public String createLocales(Category category, Language language, String phraseList) {
         boolean isDiarizationEnabled = switch (category) {
             case SONG, CONVERSATION -> true;
             case AUDIOBOOK, LECTURE -> false;
@@ -93,6 +93,26 @@ public class BatchTranscription {
             diarizationSettings.put("enabled", true);
 
             definitionMap.put("diarization", diarizationSettings);
+        }
+
+        // Add phrase list if provided
+        if (phraseList != null && !phraseList.trim().isEmpty()) {
+            String[] phrases = phraseList.trim().split("\n");
+            java.util.List<String> cleanedPhrases = new java.util.ArrayList<>();
+            
+            for (String phrase : phrases) {
+                String trimmed = phrase.trim();
+                if (!trimmed.isEmpty()) {
+                    cleanedPhrases.add(trimmed);
+                }
+            }
+            
+            if (!cleanedPhrases.isEmpty()) {
+                log.info("Adding {} custom phrases to transcription request", cleanedPhrases.size());
+                Map<String, Object> phraseListSettings = new HashMap<>();
+                phraseListSettings.put("phrases", cleanedPhrases);
+                definitionMap.put("phraseList", phraseListSettings);
+            }
         }
 
         try {
