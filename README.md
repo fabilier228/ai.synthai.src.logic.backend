@@ -14,3 +14,13 @@
 - Build: `./mvnw clean package`
 - Tests: `./mvnw test`
 - Docker build: `docker build -t logic-backend:dev .`
+
+## Integration Test Reports
+
+- Run integration tests (example class): `./mvnw test -Dtest=ControllersIntegrationTest`
+- Generate HTML test report: `./mvnw surefire-report:report-only`
+
+Generated artifacts:
+
+- `target/surefire-reports/*.xml` (JUnit XML for CI)
+- `target/site/surefire-report.html` (HTML report)
